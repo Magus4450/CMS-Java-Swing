@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.net.ConnectException;
 import java.sql.*;
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class DBUtils {
@@ -11,6 +12,8 @@ public class DBUtils {
     static final String url = "jdbc:mysql://localhost:3306/jdbc";
     static final String user = "root";
     static final String password = "Poophead009";
+
+    private boolean isDataDumped = false;
 
     static final String dbName = "CMS2059521";
     Connection connection;
@@ -127,11 +130,11 @@ public class DBUtils {
             // moduleRequirements -> store id of modules
             String sql = String.format("""
                 CREATE TABLE `%s`.`MODULE` (
-                  `moduleCode` INT NOT NULL,
+                  `moduleCode` VARCHAR(10) NOT NULL,
                   `moduleName` VARCHAR(45) NULL,
                   `moduleLevel` INT NULL,
                   `moduleCredit` INT NULL,
-                  `moduleRequirements` VARCHAR(200) NULL,
+                  `isOptional` INT NOT NULL,
                   PRIMARY KEY (`moduleCode`));""", dbName);
 
             statement.execute(sql);
@@ -150,12 +153,11 @@ public class DBUtils {
             String sql = String.format("""
                 CREATE TABLE `%s`.`course` (
                   `courseId` INT NOT NULL,
-                  `courseCredit` INT NOT NULL,
+                  `courseName` VARCHAR(100) NOT NULL,
                   `courseDuration` INT NOT NULL,
                   `courseSemesters` INT NOT NULL,
-                  `courseIsAvailable` BIT NOT NULL,
-                  `courseTeachers` VARCHAR(100) NOT NULL,
-                  `courseModules` VARCHAR(100) NOT NULL,
+                  `courseIsAvailable` INT NOT NULL,
+                  `courseModules` VARCHAR(200) NOT NULL,
                   PRIMARY KEY (`courseId`));""", dbName);
 
             statement.execute(sql);
@@ -240,12 +242,56 @@ public class DBUtils {
         return false;
     }
 
+    public void insertIntoCourse(String[] data){
+        try{
+
+            String sql = String.format("""
+                INSERT INTO `%s`.`COURSE` (
+                    `courseId`,
+                    `courseName`,
+                    `courseDuration`,
+                    `courseSemesters`,
+                    `courseIsAvailable`,
+                    `courseModules`)
+                VALUES (
+                  "%s","%s","%s","%s","%s","%s");""", dbName, data[0], data[1], data[2],data[3],data[4],data[5]);
+            statement.executeUpdate(sql);
+
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
+    }
+
+    public void insertIntoModule(String[] data){
+        try{
+            String sql = String.format("""
+                INSERT INTO `%s`.`MODULE` (
+                    `moduleCode`,
+                    `moduleName`,
+                    `moduleLevel`,
+                    `moduleCredit`,
+                    `isOptional`)
+                VALUES(
+                  "%s","%s","%s","%s","%s");""", dbName, data[0], data[1], data[2],data[3],data[4]);
+            statement.executeUpdate(sql);
+
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
+    }
+
 
 
     private void dumpData(){
-        this.dumpAdminData();
-        this.dumpStudentData();
-        this.dumpTeacherData();
+        if(!this.isDataDumped){
+            this.dumpAdminData();
+            this.dumpStudentData();
+            this.dumpTeacherData();
+            this.dumpModuleData();
+            this.dumpCourseData();
+            this.isDataDumped = true;
+        }
+
     }
     private void dumpStudentData() {
 
@@ -294,6 +340,40 @@ public class DBUtils {
             sc.close();
         } catch (FileNotFoundException e){
             System.out.println("studentData.csv not Found!");
+            e.printStackTrace();
+        }
+
+    }
+
+    private void dumpCourseData(){
+        try{
+            Scanner sc = new Scanner(new File("src/DummyData/courseData.csv"));
+            String[] data;
+            while (sc.hasNextLine()){
+                data = sc.nextLine().split(",");
+                this.insertIntoCourse(data);
+            }
+            System.out.println("Course data dumped into database successfully!");
+            sc.close();
+        } catch (FileNotFoundException e){
+            System.out.println("courseData.csv not Found!");
+            e.printStackTrace();
+        }
+
+    }
+
+    private void dumpModuleData(){
+        try{
+            Scanner sc = new Scanner(new File("src/DummyData/moduleData.csv"));
+            String[] data;
+            while (sc.hasNextLine()){
+                data = sc.nextLine().split(",");
+                this.insertIntoModule(data);
+            }
+            System.out.println("Module data dumped into database successfully!");
+            sc.close();
+        } catch (FileNotFoundException e){
+            System.out.println("moduleData.csv not Found!");
             e.printStackTrace();
         }
 

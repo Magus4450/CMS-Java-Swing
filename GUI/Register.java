@@ -13,7 +13,7 @@ public class Register extends JFrame implements ActionListener {
     JLabel user_label, password_label, message, title_label;
     JTextField user_text;
     JPasswordField password_text;
-    JButton goNext;
+    JButton goNext, back;
     JRadioButton adminBtn, studentBtn, teacherBtn;
     ButtonGroup group;
 
@@ -49,11 +49,15 @@ public class Register extends JFrame implements ActionListener {
         // Register
         goNext = new JButton("NEXT");
 
+        // Back
+        back = new JButton("BACK");
+
         title_label.setBounds(60, 20, 200, 20);
         studentBtn.setBounds(60, 70, 80, 30);
         teacherBtn.setBounds(140, 70, 80, 30);
         adminBtn.setBounds(220, 70, 80, 30);
-        goNext.setBounds(100, 130, 150, 30);
+        goNext.setBounds(200, 130, 150, 30);
+        back.setBounds(30, 130, 150, 30);
 
 
 
@@ -72,8 +76,12 @@ public class Register extends JFrame implements ActionListener {
         panel.add(teacherBtn);
         panel.add(adminBtn);
         panel.add(goNext);
+        panel.add(back);
+
 
         goNext.addActionListener(this);
+        back.addActionListener(this);
+
 
 
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -96,12 +104,19 @@ public class Register extends JFrame implements ActionListener {
         if( e.getSource() == goNext){
             if (studentBtn.isSelected()){
                 System.out.println("Student");
+                this.dispose();
+                new StudentRegister();
             } else if (teacherBtn.isSelected()){
                 System.out.println("Teacher");
+                this.dispose();
+                new TeacherRegister();
             }else if (adminBtn.isSelected()){
                 System.out.println("Admin");
             }
 
+        } else if (e.getSource() == back){
+            this.dispose();
+            new Login();
         }
 
     }

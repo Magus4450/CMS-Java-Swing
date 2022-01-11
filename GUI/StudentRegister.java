@@ -1,5 +1,6 @@
 package GUI;
 
+
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
@@ -7,22 +8,22 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class Login extends JFrame implements ActionListener {
+public class StudentRegister extends JFrame implements ActionListener {
 
     JPanel panel;
     JLabel user_label, password_label, message, title_label;
     JTextField user_text;
     JPasswordField password_text;
-    JButton login, register;
+    JButton register, back;
     JRadioButton adminBtn, studentBtn, teacherBtn;
 
 
 
-    Login(){
+    StudentRegister(){
 
         // Title Label
         title_label = new JLabel();
-        title_label.setText("LOGIN");
+        title_label.setText("STUDENT REGISTER");
         title_label.setFont(new Font("Comic Sans", Font.BOLD, 20));
 
         // User Label
@@ -70,12 +71,12 @@ public class Login extends JFrame implements ActionListener {
 
 
         // Login
-        login = new JButton("LOGIN");
-
-        // Register
         register = new JButton("REGISTER");
 
-        title_label.setBounds(60, 20, 100, 20);
+        // Register
+        back = new JButton("BACK");
+
+        title_label.setBounds(60, 20, 300, 20);
         user_label.setBounds(60,60,30,30);
         user_text.setBounds(100,60,200,30);
         password_label.setBounds(60, 100, 30, 30);
@@ -84,8 +85,8 @@ public class Login extends JFrame implements ActionListener {
         teacherBtn.setBounds(140, 130, 80, 30);
         adminBtn.setBounds(220, 130, 80, 30);
         message.setBounds(60, 160, 200, 30);
-        login.setBounds(200, 200, 150 ,30);
-        register.setBounds(30, 200, 150, 30);
+        register.setBounds(200, 200, 150 ,30);
+        back.setBounds(30, 200, 150, 30);
 
 
 
@@ -108,11 +109,11 @@ public class Login extends JFrame implements ActionListener {
         panel.add(studentBtn);
         panel.add(teacherBtn);
         panel.add(adminBtn);
-        panel.add(login);
         panel.add(register);
+        panel.add(back);
 
-        login.addActionListener(this);
         register.addActionListener(this);
+        back.addActionListener(this);
 
 
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -132,20 +133,11 @@ public class Login extends JFrame implements ActionListener {
     }
     @Override
     public void actionPerformed(ActionEvent e) {
-        if( e.getSource() == login){
-            String userName = user_text.getText();
-            String password = new String (password_text.getPassword());
-            System.out.println(userName);
-            System.out.println(password);
-            if (userName.trim().equals("admin") && password.trim().equals("admin")) {
-                message.setText(" Hello " + userName
-                        + "");
-            } else {
-                message.setText(" Invalid user.. ");
-            }
-        } else if(e.getSource() == register){
+        if( e.getSource() == back){
             this.dispose();
             new Register();
+        } else if(e.getSource() == register){
+            System.out.println("Registered");
         }
 
     }

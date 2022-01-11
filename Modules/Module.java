@@ -7,16 +7,16 @@ public class Module {
     private String moduleCode;
     private int moduleLevel;
     private int moduleCredit;
-    private ArrayList<String> moduleRequirements;
-
-
-    public ArrayList<String> getModuleRequirements() {
-        return moduleRequirements;
-    }
-
-    public void setModuleRequirements(ArrayList<String> moduleRequirements) {
-        this.moduleRequirements = moduleRequirements;
-    }
+//    private ArrayList<String> moduleRequirements;
+//
+//
+//    public ArrayList<String> getModuleRequirements() {
+//        return moduleRequirements;
+//    }
+//
+//    public void setModuleRequirements(ArrayList<String> moduleRequirements) {
+//        this.moduleRequirements = moduleRequirements;
+//    }
 
     public int getModuleCredit() {
         return moduleCredit;
