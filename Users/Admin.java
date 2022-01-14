@@ -4,7 +4,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import static DBHelpers.DBCRUD.getAdminData;
-import static DBHelpers.DBCRUD.getTeacherData;
+
 
 public class Admin{
 

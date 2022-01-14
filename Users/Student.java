@@ -45,7 +45,7 @@ public class Student extends User {
 
     @Override
     public boolean register(){
-        return registerStudent(getUsername(), getPassword(),getFirstName(), getLastName(), getAddress(),getContact());
+        return registerStudent(getLevel(), getRemarks(),getUsername(), getPassword(),getFirstName(), getLastName(), getAddress(),getContact());
     }
 
     @Override

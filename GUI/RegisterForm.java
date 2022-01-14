@@ -1,6 +1,10 @@
 package GUI;
 
 
+import Users.Student;
+import Users.Teacher;
+import com.mysql.cj.log.Log;
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
@@ -16,11 +20,13 @@ public class RegisterForm extends JFrame implements ActionListener {
     JPasswordField password_text, cPassword_text;
     JButton register, back;
     JRadioButton adminBtn, studentBtn, teacherBtn;
-
+    String userType;
 
 
     RegisterForm(String userType){
 
+
+        this.userType = userType;
         // Title Label
         title_label = new JLabel();
         title_label.setText(userType +" REGISTER");
@@ -166,6 +172,31 @@ public class RegisterForm extends JFrame implements ActionListener {
             if (!password.equals(cPassword)){
                 message.setText("Password doesnt match");
             }
+
+            String firstName = first_text.getText();
+            String lastName = last_text.getText();
+            String address = address_text.getText();
+            String contact = contact_text.getText();
+
+            if(this.userType.equals("STUDENT")){
+                Student st = new Student(username, password, firstName, lastName, address,contact);
+                if(st.register()){
+                    System.out.println("Student Registered");
+                    this.dispose();
+                    JOptionPane.showMessageDialog(null, "You have been registered successfully.", "Registered", JOptionPane.INFORMATION_MESSAGE);
+                    new Login();
+                }
+            }else if(this.userType.equals("TEACHER")){
+                Teacher t = new Teacher(username, password, firstName, lastName, address,contact);
+                if(t.register()){
+                    System.out.println("Teacher Registered");
+                    this.dispose();
+                    JOptionPane.showMessageDialog(null, "You have been registered successfully.", "Registered", JOptionPane.INFORMATION_MESSAGE);
+                    new Login();
+                }
+            }
+
+
             System.out.println("Registered");
         }
 

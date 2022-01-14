@@ -12,7 +12,7 @@ import static DBHelpers.DBCRUD.*;
 
 public class DBUtils {
 
-    static final String url = "jdbc:mysql://localhost:3306/jdbc";
+    static final String url = "jdbc:mysql://localhost:3306/";
     static final String user = "root";
     static final String password = "Poophead009";
 
@@ -75,7 +75,6 @@ public class DBUtils {
                    `username` VARCHAR(45) NULL,
                     `password` VARCHAR(200) NULL,
                     `firstName` VARCHAR(45) NULL,
-                    `middleName` VARCHAR(45) NULL,
                     `lastName` VARCHAR(45) NULL,
                     `address` VARCHAR(45) NULL,
                     `contact` VARCHAR(45) NULL,
@@ -99,7 +98,6 @@ public class DBUtils {
                   `username` VARCHAR(45) NULL,
                     `password` VARCHAR(200) NULL,
                     `firstName` VARCHAR(45) NULL,
-                    `middleName` VARCHAR(45) NULL,
                     `lastName` VARCHAR(45) NULL,
                     `address` VARCHAR(45) NULL,
                     `contact` VARCHAR(45) NULL,

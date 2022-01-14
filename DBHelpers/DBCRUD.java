@@ -34,7 +34,8 @@ public class DBCRUD {
                 `address`,
                 `contact` )
             VALUES (
-              "%s","%s","%s","%s","%s","%s","%s","%s");""", dbName, data[1], data[2],data[3],data[4],data[5],data[6],data[7],data[8]);
+              %s,"%s","%s","%s","%s","%s","%s","%s");""", dbName, data[1], data[2],data[3],data[4],data[5],data[6],data[7],data[8]);
+
             statement.executeUpdate(sql);
             return true;
 
@@ -73,13 +74,9 @@ public class DBCRUD {
                 INSERT INTO `%s`.`ADMIN` (
                     `adminId`,
                     `username`,
-                    `password`,
-                    `firstName`,
-                    `lastName`,
-                    `address`,
-                    `contact`)
+                    `password`)
                 VALUES (
-                  "%s","%s","%s","%s","%s","%s","%s");""", dbName, data[0], data[1], data[2],data[3],data[4],data[5],data[6]);
+                  "%s","%s","%s");""", dbName, data[0], data[1], data[2]);
             statement.executeUpdate(sql);
             return true;
 
@@ -166,32 +163,35 @@ public class DBCRUD {
             return null;
         }
     }
-
-    public static boolean registerStudent(String username, String password, String firstName, String lastName, String address, String contact){
-        return register("STUDENT", username, password, firstName, lastName, address, contact);
-    }
-
     public static boolean registerTeacher(String username, String password, String firstName, String lastName, String address, String contact){
-        return register("TEACHER", username, password, firstName, lastName, address, contact);
-    }
-
-
-
-    private static boolean register(String userType, String username, String password, String firstName, String lastName, String address, String contact){
         try{
             String sql = String.format("""
-                SELECT * FROM `%s`.`%s` WHERE `username` = "%s";""", dbName, userType, username);
-            System.out.println(sql);
+                SELECT * FROM `%s`.`TEACHER` WHERE `username` = "%s";""", dbName, username);
             ResultSet rs = statement.executeQuery(sql);
             if(rs.next()){
                 System.out.println("Username is already used!");
                 return false;
             } else {
-                if(userType.equals("TEACHER")){
-//                    insertIntoTeacher()
-                }else if (userType.equals("STUDENT")){
-                    //
-                }
+                String[] arr = {null, username, password, firstName, lastName, address,contact};
+                insertIntoTeacher(arr);
+                return true;
+            }
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+        return false;
+    }
+    public static boolean registerStudent(int level, String remarks, String username, String password, String firstName, String lastName, String address, String contact){
+        try{
+            String sql = String.format("""
+                SELECT * FROM `%s`.`STUDENT` WHERE `username` = "%s";""", dbName, username);
+            ResultSet rs = statement.executeQuery(sql);
+            if(rs.next()){
+                System.out.println("Username is already used!");
+                return false;
+            } else {
+                String[] arr = {null, Integer.toString(level), remarks, username, password, firstName, lastName, address,contact};
+                insertIntoStudent(arr);
                 return true;
             }
         }catch (SQLException e){
