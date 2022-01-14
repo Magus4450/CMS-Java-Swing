@@ -1,11 +1,14 @@
 package DBHelpers;
 
+import javax.swing.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.net.ConnectException;
 import java.sql.*;
 import java.util.Arrays;
 import java.util.Scanner;
+
+import static DBHelpers.DBCRUD.*;
 
 public class DBUtils {
 
@@ -16,8 +19,8 @@ public class DBUtils {
     private boolean isDataDumped = false;
 
     static final String dbName = "CMS2059521";
-    Connection connection;
-    Statement statement;
+    static Connection connection;
+    static Statement statement;
 
     public DBUtils(){
         try{
@@ -25,12 +28,18 @@ public class DBUtils {
 
             statement = connection.createStatement();
             System.out.println("Connection Established");
+            new DBCRUD();
         } catch(Exception e){
             System.out.println("SQL Server is Offline!");
+            JOptionPane.showMessageDialog(null, "SQL Server is Offline. Please turn on the server to run the program.", "Admin Register", JOptionPane.INFORMATION_MESSAGE);
             e.printStackTrace();
         }
         this.createDatabase();
         this.dumpData();
+    }
+
+    public static Connection getDBConnection(){
+        return connection;
     }
 
     private void createDatabase(){
@@ -42,6 +51,7 @@ public class DBUtils {
             this.createTables();
         } catch(SQLException e){
             System.out.println("Database already exists!");
+            this.isDataDumped = true;
         }
 
     }
@@ -109,12 +119,7 @@ public class DBUtils {
                 CREATE TABLE `%s`.`ADMIN` (
                   `adminId` INT NOT NULL AUTO_INCREMENT,
                   `username` VARCHAR(45) NULL,
-                    `password` VARCHAR(200) NULL,
-                    `firstName` VARCHAR(45) NULL,
-                    `middleName` VARCHAR(45) NULL,
-                    `lastName` VARCHAR(45) NULL,
-                    `address` VARCHAR(45) NULL,
-                    `contact` VARCHAR(45) NULL,
+                  `password` VARCHAR(200) NULL,
                   PRIMARY KEY (`adminId`));""", dbName);
 
             statement.execute(sql);
@@ -168,117 +173,7 @@ public class DBUtils {
         }
     }
 
-    public boolean insertIntoStudent(String[] data){
-        try{
 
-            String sql = String.format("""
-            INSERT INTO `%s`.`STUDENT` (
-                `studentId`,
-                `studentLevel`,
-                `studentRemarks`,
-                `username`,
-                `password`,
-                `firstName`,
-                `middleName`,
-                `lastName`,
-                `address`,
-                `contact` )
-            VALUES (
-              "%s","%s","%s","%s","%s","%s","%s","%s","%s","%s");""", dbName, data[0], data[1], data[2],data[3],data[4],data[5],data[6],data[7],data[8],data[9]);
-            statement.executeUpdate(sql);
-            return true;
-
-        } catch (SQLException e){
-            e.printStackTrace();
-        }
-        return false;
-    }
-
-    public boolean insertIntoTeacher(String[] data){
-        try{
-
-            String sql = String.format("""
-                INSERT INTO `%s`.`TEACHER` (
-                    `teacherId`,
-                   `username`,
-                    `password`,
-                    `firstName`,
-                    `middleName`,
-                    `lastName`,
-                    `address`,
-                    `contact`)
-                VALUES (
-                  "%s","%s","%s","%s","%s","%s","%s","%s");""", dbName, data[0], data[1], data[2],data[3],data[4],data[5],data[6],data[7]);
-            statement.executeUpdate(sql);
-            return true;
-
-        } catch (SQLException e){
-            e.printStackTrace();
-        }
-        return false;
-    }
-
-    public boolean insertIntoAdmin(String[] data){
-        try{
-
-            String sql = String.format("""
-                INSERT INTO `%s`.`ADMIN` (
-                    `adminId`,
-                    `username`,
-                    `password`,
-                    `firstName`,
-                    `middleName`,
-                    `lastName`,
-                    `address`,
-                    `contact`)
-                VALUES (
-                  "%s","%s","%s","%s","%s","%s","%s","%s");""", dbName, data[0], data[1], data[2],data[3],data[4],data[5],data[6],data[7]);
-            statement.executeUpdate(sql);
-            return true;
-
-        } catch (SQLException e){
-            e.printStackTrace();
-        }
-        return false;
-    }
-
-    public void insertIntoCourse(String[] data){
-        try{
-
-            String sql = String.format("""
-                INSERT INTO `%s`.`COURSE` (
-                    `courseId`,
-                    `courseName`,
-                    `courseDuration`,
-                    `courseSemesters`,
-                    `courseIsAvailable`,
-                    `courseModules`)
-                VALUES (
-                  "%s","%s","%s","%s","%s","%s");""", dbName, data[0], data[1], data[2],data[3],data[4],data[5]);
-            statement.executeUpdate(sql);
-
-        } catch (SQLException e){
-            e.printStackTrace();
-        }
-    }
-
-    public void insertIntoModule(String[] data){
-        try{
-            String sql = String.format("""
-                INSERT INTO `%s`.`MODULE` (
-                    `moduleCode`,
-                    `moduleName`,
-                    `moduleLevel`,
-                    `moduleCredit`,
-                    `isOptional`)
-                VALUES(
-                  "%s","%s","%s","%s","%s");""", dbName, data[0], data[1], data[2],data[3],data[4]);
-            statement.executeUpdate(sql);
-
-        } catch (SQLException e){
-            e.printStackTrace();
-        }
-    }
 
 
 
@@ -300,7 +195,7 @@ public class DBUtils {
             String[] data;
             while (sc.hasNext()) {
                 data = sc.next().split(",");
-                this.insertIntoStudent(data);
+                insertIntoStudent(data);
             }
             System.out.println("Student data dumped into database successfully!");
             sc.close();
@@ -317,7 +212,7 @@ public class DBUtils {
             String[] data;
             while (sc.hasNext()){
                 data = sc.next().split(",");
-                this.insertIntoTeacher(data);
+                insertIntoTeacher(data);
             }
             System.out.println("Teacher data dumped into database successfully!");
             sc.close();
@@ -334,7 +229,7 @@ public class DBUtils {
             String[] data;
             while (sc.hasNext()){
                 data = sc.next().split(",");
-                this.insertIntoAdmin(data);
+                insertIntoAdmin(data);
             }
             System.out.println("Admin data dumped into database successfully!");
             sc.close();
@@ -351,7 +246,7 @@ public class DBUtils {
             String[] data;
             while (sc.hasNextLine()){
                 data = sc.nextLine().split(",");
-                this.insertIntoCourse(data);
+                insertIntoCourse(data);
             }
             System.out.println("Course data dumped into database successfully!");
             sc.close();
@@ -368,7 +263,7 @@ public class DBUtils {
             String[] data;
             while (sc.hasNextLine()){
                 data = sc.nextLine().split(",");
-                this.insertIntoModule(data);
+                insertIntoModule(data);
             }
             System.out.println("Module data dumped into database successfully!");
             sc.close();
@@ -379,41 +274,7 @@ public class DBUtils {
 
     }
 
-    public boolean loginStudent(String username, String password){
-        return this.login(username, password, "STUDENT");
-    }
-    public boolean loginTeacher(String username, String password){
-        return this.login(username, password, "TEACHER");
-    }
-    public boolean loginAdmin(String username, String password){
-        return this.login(username, password, "ADMIN");
-    }
 
-    private boolean login(String username, String password, String userType){
-        try{
-            String sql = String.format("""
-                SELECT * FROM `%s`.`%s` WHERE `username` = "%s" AND `password` = "%s";""", dbName, userType, username, password);
-            System.out.println(sql);
-            ResultSet rs = statement.executeQuery(sql);
-            if (rs != null){
-                while(rs.next()){
-                    System.out.println(rs.getString("username"));
-                }
-                System.out.println("User logged in!");
-                return true;
-
-            } else {
-                System.out.println("User couldn't be logged in!");
-                return false;
-            }
-//            statement.execute(sql);
-
-        } catch (SQLException e){
-            System.out.println("User couldn't be logged in!");
-            e.printStackTrace();
-            return false;
-        }
-    }
     public static void main(String[] args) {
         new DBUtils();
     }

@@ -35,6 +35,7 @@ public class Register extends JFrame implements ActionListener {
 
 //        studentBtn.setBounds();
         studentBtn.addActionListener(this);
+        studentBtn.setSelected(true);
         teacherBtn.addActionListener(this);
         adminBtn.addActionListener(this);
 
@@ -105,12 +106,13 @@ public class Register extends JFrame implements ActionListener {
             if (studentBtn.isSelected()){
                 System.out.println("Student");
                 this.dispose();
-                new StudentRegister();
+                new RegisterForm("STUDENT");
             } else if (teacherBtn.isSelected()){
                 System.out.println("Teacher");
                 this.dispose();
-                new TeacherRegister();
+                new RegisterForm("TEACHER");
             }else if (adminBtn.isSelected()){
+                JOptionPane.showMessageDialog(null, "Please contact administration to register as an admin.", "Admin Register", JOptionPane.INFORMATION_MESSAGE);
                 System.out.println("Admin");
             }
 

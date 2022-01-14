@@ -3,12 +3,30 @@ package Users;
 public abstract class User {
 
     private String username;
+    private String password;
     private int id;
     private String firstName;
-    private String middleName;
     private String lastName;
     private String address;
     private String contact;
+
+    protected User(String username, String password, String firstName, String lastName, String address, String contact) {
+        this.username = username;
+        this.password = password;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.address = address;
+        this.contact = contact;
+    }
+
+    protected User(String username, String password){
+        this.username = username;
+        this.password = password;
+    }
+
+    public abstract boolean register();
+    public abstract boolean login();
+
 
     public String getUsername() {
         return username;
@@ -33,14 +51,6 @@ public abstract class User {
         this.firstName = firstName;
     }
 
-    public String getMiddleName() {
-        return middleName;
-    }
-
-    public void setMiddleName(String middleName) {
-        this.middleName = middleName;
-    }
-
     public String getLastName() {
         return lastName;
     }
@@ -63,5 +73,13 @@ public abstract class User {
 
     public void setContact(String contact) {
         this.contact = contact;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }

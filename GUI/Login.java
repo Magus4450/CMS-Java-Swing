@@ -1,11 +1,18 @@
 package GUI;
 
+import Users.Admin;
+import Users.Student;
+import Users.Teacher;
+
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
+import static DBHelpers.DBCRUD.*;
+import static DBHelpers.DBUtils.*;
 
 public class Login extends JFrame implements ActionListener {
 
@@ -18,7 +25,7 @@ public class Login extends JFrame implements ActionListener {
 
 
 
-    Login(){
+    public Login(){
 
         // Title Label
         title_label = new JLabel();
@@ -56,6 +63,7 @@ public class Login extends JFrame implements ActionListener {
 
 //        studentBtn.setBounds();
         studentBtn.addActionListener(this);
+        studentBtn.setSelected(true);
         teacherBtn.addActionListener(this);
         adminBtn.addActionListener(this);
 
@@ -137,6 +145,33 @@ public class Login extends JFrame implements ActionListener {
             String password = new String (password_text.getPassword());
             System.out.println(userName);
             System.out.println(password);
+
+            if (studentBtn.isSelected()){
+                Student st = new Student(userName, password);
+                if (st.login()){
+                    System.out.println("Logged in");
+                }else {
+                    System.out.println("Wrong Std Creds!");
+                }
+            } else if(teacherBtn.isSelected()){
+                Teacher t = new Teacher(userName, password);
+                if(t.login()){
+                    System.out.println("Teacher logged in!");
+                }else{
+                    System.out.println("Teacher Wrong Creds!");
+                }
+            } else if(adminBtn.isSelected()){
+                Admin a = new Admin(userName, password);
+                if(a.login()){
+                    System.out.println("Admin Logged In!");
+                }else {
+                    System.out.println("Admin Wrong Creds!");
+                }
+            }
+
+
+
+
             if (userName.trim().equals("admin") && password.trim().equals("admin")) {
                 message.setText(" Hello " + userName
                         + "");
