@@ -4,6 +4,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import static DBHelpers.DBCRUD.getAdminData;
+import static DBHelpers.DBCRUD.loginAdmin;
 
 
 public class Admin{
@@ -43,7 +44,7 @@ public class Admin{
     }
 
     public boolean login(){
-        ResultSet rs = getAdminData(getUsername(), getPassword());
+        ResultSet rs = loginAdmin(getUsername(), getPassword());
         try{
             if(rs.next()){
                 String username = rs.getString("username");

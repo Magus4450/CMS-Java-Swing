@@ -78,6 +78,7 @@ public class DBUtils {
                     `lastName` VARCHAR(45) NULL,
                     `address` VARCHAR(45) NULL,
                     `contact` VARCHAR(45) NULL,
+                    `teacherModules` VARCHAR(200) NULL,
                   PRIMARY KEY (`teacherId`));""", dbName);
 
             statement.execute(sql);
@@ -91,7 +92,7 @@ public class DBUtils {
     private void createStudentTable(){
         try{
             String sql = String.format("""
-                CREATE TABLE `%s`.`STUDENT` (
+                CREATE TABLE `%s`.`g` (
                   `studentId` INT NOT NULL AUTO_INCREMENT,
                   `studentLevel` INT NOT NULL,
                   `studentRemarks` VARCHAR(200) NULL,
@@ -101,6 +102,10 @@ public class DBUtils {
                     `lastName` VARCHAR(45) NULL,
                     `address` VARCHAR(45) NULL,
                     `contact` VARCHAR(45) NULL,
+                    `enrolledCourse` VARCHAR(100) NULL,
+                    `passedSem` INT NULL,
+                    `marks` VARCHAR(200) NULL,
+                    `enrolledModules` VARCHAR(300) NULL,
                   PRIMARY KEY (`studentId`));""", dbName);
 
             statement.execute(sql);
@@ -130,14 +135,16 @@ public class DBUtils {
 
     private void createModuleTable(){
         try{
-            // moduleRequirements -> store id of modules
             String sql = String.format("""
                 CREATE TABLE `%s`.`MODULE` (
                   `moduleCode` VARCHAR(10) NOT NULL,
-                  `moduleName` VARCHAR(45) NULL,
+                  `moduleName` VARCHAR(100) NULL,
                   `moduleLevel` INT NULL,
                   `moduleCredit` INT NULL,
                   `isOptional` INT NOT NULL,
+                  `moduleSem` INT NOT NULL,
+                  `moduleTeacher` VARCHAR(100) NULL,
+                  `courseId` INT NOT NULL,
                   PRIMARY KEY (`moduleCode`));""", dbName);
 
             statement.execute(sql);
@@ -154,7 +161,7 @@ public class DBUtils {
             // courseTeachers -> Store id of teachers
             // courseModules -> Store id of modules
             String sql = String.format("""
-                CREATE TABLE `%s`.`course` (
+                CREATE TABLE `%s`.`COURSE` (
                   `courseId` INT NOT NULL,
                   `courseName` VARCHAR(100) NOT NULL,
                   `courseDuration` INT NOT NULL,
@@ -191,8 +198,8 @@ public class DBUtils {
         try {
             Scanner sc = new Scanner(new File("src/DummyData/studentData.csv"));
             String[] data;
-            while (sc.hasNext()) {
-                data = sc.next().split(",");
+            while (sc.hasNextLine()) {
+                data = sc.nextLine().split(",");
                 insertIntoStudent(data);
             }
             System.out.println("Student data dumped into database successfully!");
@@ -208,8 +215,8 @@ public class DBUtils {
         try{
             Scanner sc = new Scanner(new File("src/DummyData/teacherData.csv"));
             String[] data;
-            while (sc.hasNext()){
-                data = sc.next().split(",");
+            while (sc.hasNextLine()){
+                data = sc.nextLine().split(",");
                 insertIntoTeacher(data);
             }
             System.out.println("Teacher data dumped into database successfully!");

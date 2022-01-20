@@ -1,28 +1,44 @@
-4CI018,Academic Skills and Team-based Learning,4,20,0
-4MM013,Computational Mathematics,4,20,0
-4CS016,Embedded Systems Programming,4,20,0
-4CS015,Fundamentals of Computing,4,20,0
-4CS017,Internet Software Architecture,4,20,0
-4CS001,Introductory Programming And Problem Solving,4,20,0
-4MM025,Probability & Statistics,4,20,0
-5CI023,Advanced Databases,5,20,0
-5CI021,Data Mining,5,20,0
-5CI022,Databases,5,20,0
-5MM014,Introduction to Operational Research,5,20,0
-5MM025,Statistical Modelling & Survey Design,5,20,0
-5CS024,Collaborative Development,5,20,0
-5CS022,Distributed and Cloud Systems Programming,5,20,0
-5CS021,Numerical Methods and Concurrency,5,20,0
-5CS019,Object-Oriented Design and Programming,5,20,0
-5CS037,Concepts and Technologies of AI,5,20,0
-5CS020,Human - Computer Interaction,5,20,0
-6CS030,Big Data,6,20,0
-6CS005,High Performance Computing,6,20,0
-6CS007,Project and Professionalism,6,40,0
-6CS014,Complex Systems,6,20,0
-6MM026,Financial Mathematics and Data Analysis,6,20,0
-6MM029,Multivariate Statistics with Cybermetrics,6,20,0
-6CS012,Artificial Intelligence and Machine Learning,6,20,1
-6CS027,Secure Mobile Application Development,6,20,1
-6CS025,Advanced Games Technologies and Programming,6,20,1
-6CS028,Advanced Web Development,6,20,1
+4CI018,Academic Skills and Team-based Learning,4,20,0,1,teacher1,1
+4MM013,Computational Mathematics,4,20,0,1,teacher2,1
+4CS016,Embedded Systems Programming,4,20,0,1,teacher3,1
+4CS015,Fundamentals of Computing,4,20,0,1,teacher4,1
+4CS017,Internet Software Architecture,4,20,0,2,teacher5,1
+4CS001,Introductory Programming And Problem Solving,4,20,0,2,teacher6,1
+4MM025,Probability & Statistics,4,20,0,2,teacher7,1
+4CS040,Web Development,4,20,0,2,teacher8,1
+4MM001,Data Science,4,20,0,2,teacher5,2
+4CS018,Server Management,4,20,0,2,teacher6,2
+4MM002,Linear Algebra,4,20,0,2,teacher7,2
+4MM014,Calculus,4,20,0,2,teacher8,2
+5CI023,Advanced Databases,5,20,0,3,teacher9,1
+5CI021,Data Mining,5,20,0,3,teacher10,1
+5CI022,Databases,5,20,0,3,teacher11,1
+5MM014,Introduction to Operational Research,5,20,0,3,teacher12,1
+5MM025,Statistical Modelling & Survey Design,5,20,0,3,teacher9,2
+5CS024,Collaborative Development,5,20,0,3,teacher10,2
+5CS022,Distributed and Cloud Systems Programming,5,20,0,3,teacher11,2
+5CS021,Numerical Methods and Concurrency,5,20,0,3,teacher12,2
+5CS019,Object-Oriented Design and Programming,5,20,0,4,teacher13,1
+5CS037,Concepts and Technologies of AI,5,20,0,4,teacher14,1
+5CS020,Human - Computer Interaction,5,20,0,4,teacher15,1
+5MM022,Multivariate Calculus,5,20,0,4,teacher16,1
+5CS050,Server Side Scripting,5,20,0,4,teacher13,2
+5CS038,Exploratory Data Analysis,5,20,0,4,teacher14,2
+5CS025,DOTNET,5,20,0,4,teacher15,2
+5MM031,Big Maths,5,20,0,4,teacher16,2
+6CS030,Big Data,6,20,0,5,teacher1,1
+6CS005,High Performance Computing,6,20,0,5,teacher2,1
+6CS007,Project and Professionalism,6,20,0,5,teacher1,2
+6CS014,Complex Systems,6,20,0,6,teacher2,2
+6MM026,Financial Mathematics and Data Analysis,6,20,0,6,teacher3,1
+6MM029,Multivariate Statistics with Cybermetrics,6,20,0,6,teacher4,1
+6CS012,Artificial Intelligence and Machine Learning,6,20,0,6,teacher5,2
+6CS027,Secure Mobile Application Development,6,20,0,5,teacher6,2
+6CS025,Advanced Games Technologies and Programming (Elective),6,20,1,5,teacher7,1
+6CS028,Advanced Web Development (Elective),6,20,1,5,teacher8,1
+6CS035,Game Development (Elective),6,20,1,5,teacher9,2
+6CS036,Computer Vision (Elective),6,20,1,5,teacher10,2
+6CS037,Natural Language Processing (Elective),6,20,1,6,teacher11,1
+6CS038,Deep Learning (Elective),6,20,1,6,teacher12,1
+6CS039,Flutter (Elective),6,20,1,6,teacher13,2
+6CS040,React Django (Elective),6,20,1,6,teacher14,2

@@ -180,12 +180,11 @@ public class RegisterForm extends JFrame implements ActionListener {
 
             if(this.userType.equals("STUDENT")){
                 Student st = new Student(username, password, firstName, lastName, address,contact);
-                if(st.register()){
-                    System.out.println("Student Registered");
-                    this.dispose();
-                    JOptionPane.showMessageDialog(null, "You have been registered successfully.", "Registered", JOptionPane.INFORMATION_MESSAGE);
-                    new Login();
-                }
+                this.dispose();
+                new CourseRegister(st);
+
+
+
             }else if(this.userType.equals("TEACHER")){
                 Teacher t = new Teacher(username, password, firstName, lastName, address,contact);
                 if(t.register()){
@@ -202,3 +201,5 @@ public class RegisterForm extends JFrame implements ActionListener {
 
     }
 }
+
+

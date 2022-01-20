@@ -10,6 +10,7 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.SQLException;
 
 import static DBHelpers.DBCRUD.*;
 import static DBHelpers.DBUtils.*;
@@ -149,13 +150,24 @@ public class Login extends JFrame implements ActionListener {
             if (studentBtn.isSelected()){
                 Student st = new Student(userName, password);
                 if (st.login()){
-                    System.out.println("Logged in");
+                    this.dispose();
+                    try {
+                        new StudentPanel(st);
+                    } catch (SQLException ex) {
+                        ex.printStackTrace();
+                    }
                 }else {
                     System.out.println("Wrong Std Creds!");
                 }
             } else if(teacherBtn.isSelected()){
                 Teacher t = new Teacher(userName, password);
                 if(t.login()){
+                    this.dispose();
+                    try {
+                        new TeacherPanel(t);
+                    } catch (SQLException ex) {
+                        ex.printStackTrace();
+                    }
                     System.out.println("Teacher logged in!");
                 }else{
                     System.out.println("Teacher Wrong Creds!");
@@ -172,12 +184,7 @@ public class Login extends JFrame implements ActionListener {
 
 
 
-            if (userName.trim().equals("admin") && password.trim().equals("admin")) {
-                message.setText(" Hello " + userName
-                        + "");
-            } else {
-                message.setText(" Invalid user.. ");
-            }
+
         } else if(e.getSource() == register){
             this.dispose();
             new Register();

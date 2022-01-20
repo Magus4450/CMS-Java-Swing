@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import static DBHelpers.DBCRUD.*;
 
 public class Teacher extends User{
-    private ArrayList<Module> moduleList;
+    private String teacherModules;
 
     public Teacher(String username, String password, String firstName, String lastName, String address, String contact){
         super(username, password, firstName, lastName,address, contact);
@@ -19,16 +19,21 @@ public class Teacher extends User{
 
     @Override
     public boolean register(){
-        return registerTeacher(getUsername(), getPassword(),getFirstName(), getLastName(), getAddress(),getContact());
+        return registerTeacher(getUsername(), getPassword(),getFirstName(), getLastName(), getAddress(),getContact(), getTeacherModules());
     }
 
     @Override
     public boolean login(){
-        ResultSet rs = getTeacherData(getUsername(), getPassword());
+        ResultSet rs = loginTeacher(getUsername(), getPassword());
         try{
             if(rs.next()){
                 String username = rs.getString("username");
                 String password = rs.getString("password");
+                setFirstName(rs.getString("firstName"));
+                setLastName(rs.getString("lastName"));
+                setAddress(rs.getString("address"));
+                setContact(rs.getString("contact"));
+                setTeacherModules(rs.getString("teacherModules"));
 
                 if(getUsername().equals(username) && getPassword().equals(password)){
                     return true;
@@ -41,11 +46,11 @@ public class Teacher extends User{
         }
         return false;
     }
-    public ArrayList<Module> getModuleList() {
-        return moduleList;
+    public String getTeacherModules() {
+        return teacherModules;
     }
-    public void setModuleList(ArrayList<Module> moduleList) {
-        this.moduleList = moduleList;
+    public void setTeacherModules(String teacherModules) {
+        this.teacherModules = teacherModules;
     }
 
 
