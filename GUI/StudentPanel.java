@@ -25,8 +25,9 @@ public class StudentPanel extends JFrame implements ActionListener {
     JButton logOutBtn, modulesBtn, resultBtn, infoBtn;
     JLabel welcomeLabel;
     String[] modules = {};
-
+    ArrayList<String> studentModules = null;
     ArrayList<String> teacherUsername = new ArrayList<>();
+    ArrayList<String> studentMarks = null;
 //    Vector columnNames, data;
     final int HEIGHT = 490;
     final int WIDTH = 1200;
@@ -131,7 +132,8 @@ public class StudentPanel extends JFrame implements ActionListener {
             modules = rs.getString("courseModules").split(" ");
 
         }
-
+        studentModules = new ArrayList<>(Arrays.asList(modules));
+        studentMarks = new ArrayList<>(Arrays.asList(st.getMarks().split(" ")));
         Vector<String> columnNames = new Vector<>();
         columnNames.add("moduleCode");
         columnNames.add("Name");
@@ -207,16 +209,7 @@ public class StudentPanel extends JFrame implements ActionListener {
 
         table.setFont(new Font("Consolas", Font.PLAIN, 15));
 
-//        DefaultTableModel tableModel = new DefaultTableModel() {
-//
-//            @Override
-//            public boolean isCellEditable(int row, int column) {
-//                //all cells false
-//                return false;
-//            }
-//        };
-//
-//        table.setModel(tableModel);
+
         table.setEnabled(false);
 
         modulesPane = new JScrollPane(table);
@@ -227,6 +220,101 @@ public class StudentPanel extends JFrame implements ActionListener {
         bottomPanel.add(modulesPane);
         SwingUtilities.updateComponentTreeUI(this);
     }
+
+    private void showResultPane() throws SQLException {
+
+        if(resultPane!=null){
+            bottomPanel.remove(resultPane);
+        }
+        if(infoPanel!=null){
+            bottomPanel.remove(infoPanel);
+        }
+        if(modulesPane!=null){
+            bottomPanel.remove(modulesPane);
+        }
+
+
+        Vector<String> columnNames = new Vector<>();
+        columnNames.add("Module Code");
+        columnNames.add("Module Name");
+        columnNames.add("Marks");
+        columnNames.add("Remarks");
+
+        JPanel semResultPanel = new JPanel();
+        semResultPanel.setLayout(new BoxLayout(semResultPanel, BoxLayout.Y_AXIS));
+//        semResultPanel.setSize(new Dimension(400,200));
+        for(int i = 0; i < st.getPassedSem()+1; i++){
+            JLabel semLabel = new JLabel("Semester " + (i+1));
+            semLabel.setFont(new Font("Consolas", Font.BOLD, 20));
+            semLabel.setBorder(new EmptyBorder(10,10,10,10));
+//            semLabel.add(Box.createRigidArea(new Dimension(10,50)));
+            Vector<Vector<String>> data = new Vector<>();
+            for(int j = 0; j < 4; j++){
+                Vector<String> row = new Vector<>(columnNames.size());
+                ResultSet rs = DBCRUD.getModuleData(studentModules.get((i*4)+j));
+                if(rs.next()){
+                    row.addElement(rs.getString("moduleCode"));
+                    row.addElement(rs.getString("moduleName"));
+                    row.addElement(studentMarks.get((i*4)+j));
+                    row.addElement(st.getRemarks());
+                }
+                data.addElement(row);
+            }
+
+
+            JTable table = new JTable(data, columnNames){
+                public Class getColumnClass(int column){
+                    for(int row =0; row<getRowCount(); row++){
+                        Object o = getValueAt(row, column);
+                        if(o!= null){
+                            return o.getClass();
+                        }
+                    }
+                    return Object.class;
+                }
+
+            };
+
+
+
+            table.setRowHeight(30);
+            table.getColumnModel().getColumn(0).setPreferredWidth(100);
+            table.getColumnModel().getColumn(1).setPreferredWidth(380);
+            table.getColumnModel().getColumn(2).setPreferredWidth(60);
+            table.getColumnModel().getColumn(3).setPreferredWidth(60);
+
+            DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+            centerRenderer.setVerticalAlignment( JLabel.CENTER );
+            centerRenderer.setHorizontalAlignment( JLabel.CENTER );
+            table.getColumnModel().getColumn(0).setCellRenderer( centerRenderer );
+            table.getColumnModel().getColumn(1).setCellRenderer( centerRenderer );
+            table.getColumnModel().getColumn(2).setCellRenderer( centerRenderer );
+            table.getColumnModel().getColumn(3).setCellRenderer( centerRenderer );
+
+
+            table.setFont(new Font("Consolas", Font.PLAIN, 15));
+
+
+            table.setEnabled(false);
+            JScrollPane tablePane = new JScrollPane(table);
+
+            semResultPanel.add(semLabel);
+            semResultPanel.add(tablePane);
+        }
+
+
+
+        modulesPane = new JScrollPane(semResultPanel);
+        modulesPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        modulesPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        modulesPane.setBounds(200, 0, WIDTH-200, HEIGHT-ROW_HEIGHT);
+
+        bottomPanel.add(modulesPane);
+        SwingUtilities.updateComponentTreeUI(this);
+    }
+
+
+
 
     private void showInfoPane() throws SQLException {
         if (modulesPane != null) {
@@ -391,6 +479,8 @@ public class StudentPanel extends JFrame implements ActionListener {
                 }else if(e.getSource() == infoBtn){
                     System.out.println("INFO");
                     showInfoPane();
+                }else if (e.getSource() == resultBtn){
+                    showResultPane();
                 }
             }
         }catch (SQLException er){

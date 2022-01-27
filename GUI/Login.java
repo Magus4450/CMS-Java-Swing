@@ -41,7 +41,7 @@ public class Login extends JFrame implements ActionListener {
 
         user_label.setIcon(new ImageIcon(userNewImg));
         user_text = new JTextField();
-        user_text.setText("Username");
+        user_text.setText("admin");
 
 
         // Password
@@ -53,7 +53,7 @@ public class Login extends JFrame implements ActionListener {
 
         password_label.setIcon(new ImageIcon(passNewImg));
         password_text = new JPasswordField();
-        password_text.setText("Password");
+        password_text.setText("admin");
 
 
         // Radio Buttons
@@ -174,6 +174,14 @@ public class Login extends JFrame implements ActionListener {
                 }
             } else if(adminBtn.isSelected()){
                 Admin a = new Admin(userName, password);
+                if(a.login()){
+                    try {
+                        this.dispose();
+                        new AdminPanel(a);
+                    } catch (SQLException ex) {
+                        ex.printStackTrace();
+                    }
+                }
                 if(a.login()){
                     System.out.println("Admin Logged In!");
                 }else {

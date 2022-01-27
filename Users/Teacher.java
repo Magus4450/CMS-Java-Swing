@@ -11,6 +11,7 @@ public class Teacher extends User{
 
     public Teacher(String username, String password, String firstName, String lastName, String address, String contact){
         super(username, password, firstName, lastName,address, contact);
+        this.teacherModules = null;
     }
 
     public Teacher(String username, String password){

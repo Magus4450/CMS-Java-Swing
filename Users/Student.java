@@ -1,6 +1,8 @@
 package Users;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import static DBHelpers.DBCRUD.*;
 
@@ -15,11 +17,13 @@ public class Student extends User {
     private String marks;
     private String enrolledModules;
 
+
     public Student(String username, String password, String firstName, String lastName, String address, String contact){
         super(username, password, firstName, lastName,address, contact);
         this.level = 4;
         this.remarks = null;
         this.marks = "TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD";
+        this.enrolledModules = null;
     }
 
     public Student(String username, String password, String firstName, String lastName, String address, String contact, String level, String remarks){
@@ -27,10 +31,13 @@ public class Student extends User {
         this.level = Integer.parseInt(level);
         this.remarks = remarks;
         this.marks = "TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD";
+        this.enrolledModules = null;
     }
 
     public Student(String username, String password){
+
         super(username, password);
+        login();
     }
 
     public void setLevel(int level) {
@@ -69,6 +76,7 @@ public class Student extends User {
                 setPassedSem(rs.getInt("passedSem"));
                 setLevel(rs.getInt("studentLevel"));
                 setMarks(rs.getString("marks"));
+                setEnrolledModules(rs.getString("enrolledModules"));
 
                 if(getUsername().equals(username) && getPassword().equals(password)){
                     return true;
@@ -87,6 +95,20 @@ public class Student extends User {
         //
     }
 
+    public void setMarksModule(String moduleCode, int mark){
+        String[] s = enrolledModules.split(" ");
+        String[] m = marks.split(" ");
+        ArrayList<String> modules = new ArrayList<String>(List.of(s));
+        ArrayList<String> marks = new ArrayList<String>(List.of(m));
+        for(String module: modules){
+            if (module.equals(moduleCode)){
+                marks.set(modules.indexOf(module),Integer.toString(mark));
+            }
+        }
+
+        setEnrolledModules(modules.toString().replace("[", "").replace("]", "").replace(",", ""));
+        setMarks(marks.toString().replace("[", "").replace("]", "").replace(",", ""));
+    }
     public String getEnrolledCourse() {
         return enrolledCourse;
     }

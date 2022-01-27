@@ -363,6 +363,25 @@ public class DBCRUD {
         return -1;
 
     }
+    public static int getStudentCount(String courseName){
+        try{
+
+            String sql = String.format("""
+                    SELECT count(*) FROM `%s`.`STUDENT` WHERE `enrolledCourse` =  "%s";""", dbName, courseName);
+            ResultSet rs = statement.executeQuery(sql);
+            if(rs.next()){
+                return rs.getInt("count(*)");
+
+            }
+        } catch (SQLException e){
+            System.out.println("Course Data couldn't be fetched");
+            e.printStackTrace();
+
+        }
+
+        return -1;
+
+    }
 
 
     public static ResultSet getModules(String enrolledCourse, int sem){
