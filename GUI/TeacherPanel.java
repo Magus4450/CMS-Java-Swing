@@ -337,13 +337,10 @@ public class TeacherPanel extends JFrame implements ActionListener {
                             DBCRUD.updateStudentData(st);
                         }
 
-
-
-
-
                     }catch (ClassCastException | NumberFormatException er){
                         JOptionPane.showMessageDialog(null, "Please enter a valid integer!", "Admin Register", JOptionPane.ERROR_MESSAGE);
                         model.setValueAt(0, row, column);
+
 
                     }catch(SQLException er){
                         er.printStackTrace();

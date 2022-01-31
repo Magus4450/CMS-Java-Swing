@@ -23,13 +23,17 @@ public class CourseInfo extends JFrame implements ActionListener {
     JLabel title_label, semester;
     JButton back, enroll;
     Student st;
-    String courseName;
-    public CourseInfo(Student st, String courseName) throws SQLException {
+    int courseId;
+    public CourseInfo(Student st, int courseId) throws SQLException {
         this.st = st;
-        this.courseName = courseName;
+        this.courseId = courseId;
 
         // Title Label
-        title_label = new JLabel(courseName);
+        ResultSet rs = DBCRUD.getCourseData(courseId);
+        if (rs.next()){
+            title_label = new JLabel(rs.getString("courseName"));
+        }
+
         title_label.setFont(new Font("Comic Sans", Font.BOLD, 20));
 
 
@@ -53,7 +57,7 @@ public class CourseInfo extends JFrame implements ActionListener {
         infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
         infoPanel.add(Box.createRigidArea(new Dimension(10,10)));
 
-        ResultSet rs = DBCRUD.getCourseData(courseName);
+        rs = DBCRUD.getCourseData(courseId);
         String[] modules = {};
 
         if(rs.next()){
@@ -80,34 +84,6 @@ public class CourseInfo extends JFrame implements ActionListener {
 
             infoPanel.add(Box.createRigidArea(new Dimension(10,10)));
         }
-
-//            if(sem <= 4){
-//                for(int i = index; i < index +4 ; i ++){
-//                    module = modules[i];
-//                    System.out.println(module);
-//                    rs  = DBCRUD.getModuleData(module);
-//
-//                    if(rs.next()){
-//                        infoPanel.add(new JLabel(rs.getString("moduleName")));
-//
-//                    }
-//                }
-//                index += 3;
-//            } else{
-//                for(int i = index; i < index +2 ; i ++){
-//                    module = modules[i];
-//                    System.out.println(module);
-//                    rs  = DBCRUD.getModuleData(module);
-//
-//                    if(rs.next()){
-//                        infoPanel.add(new JLabel(rs.getString("moduleName")));
-//
-//                    }
-//                }
-//                infoPanel.add(new JLabel("(Elective)"));
-//                index += 2;
-//            }
-
 
 
         JScrollPane pane = new JScrollPane(infoPanel);
@@ -149,8 +125,8 @@ public class CourseInfo extends JFrame implements ActionListener {
             this.dispose();
             new CourseRegister(st);
         }else if (e.getSource() == enroll){
-            st.setEnrolledCourse(courseName);
-            ResultSet rs = DBCRUD.getModules(st.getEnrolledCourse(), 1);
+            st.setEnrolledCourse(courseId);
+            ResultSet rs = DBCRUD.getModules(Integer.toString(st.getEnrolledCourse()), 1);
             ArrayList<String> modules = new ArrayList<>();
             try {
 

@@ -24,6 +24,10 @@ public abstract class User {
         this.password = password;
     }
 
+    protected User(String username){
+        this.username = username;
+    }
+
     public abstract boolean register();
     public abstract boolean login();
 

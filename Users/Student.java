@@ -12,7 +12,7 @@ public class Student extends User {
 
     private int level;
     private String remarks;
-    private String enrolledCourse;
+    private int enrolledCourse;
     private int passedSem;
     private String marks;
     private String enrolledModules;
@@ -72,7 +72,7 @@ public class Student extends User {
                 setLastName(rs.getString("lastName"));
                 setAddress(rs.getString("address"));
                 setContact(rs.getString("contact"));
-                setEnrolledCourse(rs.getString("enrolledCourse"));
+                setEnrolledCourse(rs.getInt("enrolledCourse"));
                 setPassedSem(rs.getInt("passedSem"));
                 setLevel(rs.getInt("studentLevel"));
                 setMarks(rs.getString("marks"));
@@ -109,11 +109,11 @@ public class Student extends User {
         setEnrolledModules(modules.toString().replace("[", "").replace("]", "").replace(",", ""));
         setMarks(marks.toString().replace("[", "").replace("]", "").replace(",", ""));
     }
-    public String getEnrolledCourse() {
+    public int getEnrolledCourse() {
         return enrolledCourse;
     }
 
-    public void setEnrolledCourse(String enrolledCourse) {
+    public void setEnrolledCourse(int enrolledCourse) {
         this.enrolledCourse = enrolledCourse;
     }
 

@@ -130,6 +130,7 @@ public class StudentPanel extends JFrame implements ActionListener {
 
         if(rs.next()){
             modules = rs.getString("courseModules").split(" ");
+            System.out.println("YES MODULES");
 
         }
         studentModules = new ArrayList<>(Arrays.asList(modules));

@@ -14,9 +14,29 @@ public class Teacher extends User{
         this.teacherModules = null;
     }
 
+    public Teacher(String username){
+        super(username);
+        ResultSet rs = getTeacherData(username);
+        try{
+            if(rs.next()){
+                setPassword(rs.getString("password"));
+                setFirstName(rs.getString("firstName"));
+                setLastName(rs.getString("lastName"));
+                setAddress(rs.getString("address"));
+                setContact(rs.getString("contact"));
+                setTeacherModules(rs.getString("teacherModules"));
+
+            }
+
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+    }
     public Teacher(String username, String password){
         super(username, password);
     }
+
+
 
     @Override
     public boolean register(){

@@ -104,9 +104,10 @@ public class CourseRegister extends JFrame implements ActionListener {
         if(e.getSource() instanceof JButton){
             if(!((JButton) e.getSource()).getText().equals("BACK")){
                 String courseName = ((JButton) e.getSource()).getText();
+                int courseId = DBCRUD.getCourseId(courseName);
                 try {
                     this.dispose();
-                    new CourseInfo(st, courseName);
+                    new CourseInfo(st, courseId);
                 } catch (SQLException ex) {
                     ex.printStackTrace();
                 }

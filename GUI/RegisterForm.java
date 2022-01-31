@@ -1,6 +1,7 @@
 package GUI;
 
 
+import DBHelpers.DBCRUD;
 import Users.Student;
 import Users.Teacher;
 import com.mysql.cj.log.Log;
@@ -10,6 +11,9 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 
 public class RegisterForm extends JFrame implements ActionListener {
 
@@ -105,7 +109,7 @@ public class RegisterForm extends JFrame implements ActionListener {
 
 
         message.setBounds(130, 330, 200, 30);
-        message.setText("TEST");
+        message.setText("");
         register.setBounds(200, 380, 140 ,30);
         back.setBounds(30, 380, 140, 30);
 
@@ -166,11 +170,26 @@ public class RegisterForm extends JFrame implements ActionListener {
             new Register();
         } else if(e.getSource() == register){
             String username = user_text.getText();
+            ResultSet rs = DBCRUD.getAllStudentData();
+            ArrayList<String> allStudents = new ArrayList<>();
+            try{
+                while(rs.next()){
+                    allStudents.add(rs.getString("username"));
+                }
+                if(allStudents.contains(username)){
+                    message.setText("Username already taken");
+                    return;
+                }
+            } catch (SQLException er){
+                er.printStackTrace();
+            }
+
             String password = new String (password_text.getPassword());
             String cPassword = new String(cPassword_text.getPassword());
 
             if (!password.equals(cPassword)){
                 message.setText("Password doesnt match");
+                return;
             }
 
             String firstName = first_text.getText();
@@ -178,6 +197,10 @@ public class RegisterForm extends JFrame implements ActionListener {
             String address = address_text.getText();
             String contact = contact_text.getText();
 
+            if(username.equals("") || firstName.equals("") || lastName.equals("") || address.equals("") || contact.equals("") || password.equals("")){
+                message.setText("Field cannot be empty");
+                return;
+            }
             if(this.userType.equals("STUDENT")){
                 Student st = new Student(username, password, firstName, lastName, address,contact);
                 this.dispose();
