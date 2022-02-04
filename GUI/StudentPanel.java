@@ -5,9 +5,7 @@ import Users.Student;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import javax.swing.plaf.TableUI;
 import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -15,20 +13,18 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Vector;
 
 public class StudentPanel extends JFrame implements ActionListener {
 
-    JPanel topPanel, bottomPanel, menuPanel, modulesInfoPanel, resultInfoPanel, infoPanel;
-    JScrollPane modulesPane,resultPane, infoPane;
+    JPanel topPanel, bottomPanel, menuPanel, modulesInfoPanel, infoPanel;
+    JScrollPane modulesPane,resultPane;
     JButton logOutBtn, modulesBtn, resultBtn, infoBtn;
     JLabel welcomeLabel;
     String[] modules = {};
     ArrayList<String> studentModules = null;
     ArrayList<String> teacherUsername = new ArrayList<>();
     ArrayList<String> studentMarks = null;
-//    Vector columnNames, data;
     final int HEIGHT = 490;
     final int WIDTH = 1200;
     final int ROW_HEIGHT = HEIGHT/7;
@@ -101,7 +97,6 @@ public class StudentPanel extends JFrame implements ActionListener {
         modulesInfoPanel.setLayout(new BoxLayout(modulesInfoPanel, BoxLayout.Y_AXIS));
 
         showModulePanel();
-//        showInstructorsPanel();
 
         bottomPanel.setLayout(null);
         bottomPanel.add(menuPanel);
@@ -114,8 +109,7 @@ public class StudentPanel extends JFrame implements ActionListener {
         this.setVisible(true);
     }
 
-    private void showModulePanel() throws SQLException {
-
+    private void refresh(){
         if(resultPane!=null){
             bottomPanel.remove(resultPane);
         }
@@ -125,6 +119,11 @@ public class StudentPanel extends JFrame implements ActionListener {
         if(modulesPane!=null){
             bottomPanel.remove(modulesPane);
         }
+    }
+
+    private void showModulePanel() throws SQLException {
+
+        refresh();
 
         ResultSet rs = DBCRUD.getCourseData(st.getEnrolledCourse());
 
@@ -142,7 +141,7 @@ public class StudentPanel extends JFrame implements ActionListener {
         columnNames.add("Credits");
         columnNames.add("Teacher");
 
-//        columnNames.addAll();
+
         Vector<Vector<String>> data = new Vector<>();
         for(int i = 0; i < Math.min(modules.length, 4*(st.getPassedSem()+1)); i++){
             Vector<String> row = new Vector<>(columnNames.size());
@@ -201,11 +200,10 @@ public class StudentPanel extends JFrame implements ActionListener {
         DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
         centerRenderer.setVerticalAlignment( JLabel.CENTER );
         centerRenderer.setHorizontalAlignment( JLabel.CENTER );
-        table.getColumnModel().getColumn(0).setCellRenderer( centerRenderer );
-        table.getColumnModel().getColumn(1).setCellRenderer( centerRenderer );
-        table.getColumnModel().getColumn(2).setCellRenderer( centerRenderer );
-        table.getColumnModel().getColumn(3).setCellRenderer( centerRenderer );
-        table.getColumnModel().getColumn(4).setCellRenderer( centerRenderer );
+        for(int i = 0; i < columnNames.size(); i++){
+            table.getColumnModel().getColumn(i).setCellRenderer( centerRenderer );
+        }
+
 
 
         table.setFont(new Font("Consolas", Font.PLAIN, 15));
@@ -224,15 +222,7 @@ public class StudentPanel extends JFrame implements ActionListener {
 
     private void showResultPane() throws SQLException {
 
-        if(resultPane!=null){
-            bottomPanel.remove(resultPane);
-        }
-        if(infoPanel!=null){
-            bottomPanel.remove(infoPanel);
-        }
-        if(modulesPane!=null){
-            bottomPanel.remove(modulesPane);
-        }
+        refresh();
 
 
         Vector<String> columnNames = new Vector<>();
@@ -263,18 +253,7 @@ public class StudentPanel extends JFrame implements ActionListener {
             }
 
 
-            JTable table = new JTable(data, columnNames){
-                public Class getColumnClass(int column){
-                    for(int row =0; row<getRowCount(); row++){
-                        Object o = getValueAt(row, column);
-                        if(o!= null){
-                            return o.getClass();
-                        }
-                    }
-                    return Object.class;
-                }
-
-            };
+            JTable table = new JTable(data, columnNames);
 
 
 
@@ -287,11 +266,9 @@ public class StudentPanel extends JFrame implements ActionListener {
             DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
             centerRenderer.setVerticalAlignment( JLabel.CENTER );
             centerRenderer.setHorizontalAlignment( JLabel.CENTER );
-            table.getColumnModel().getColumn(0).setCellRenderer( centerRenderer );
-            table.getColumnModel().getColumn(1).setCellRenderer( centerRenderer );
-            table.getColumnModel().getColumn(2).setCellRenderer( centerRenderer );
-            table.getColumnModel().getColumn(3).setCellRenderer( centerRenderer );
-
+            for(int j = 0; j < columnNames.size(); j++){
+                table.getColumnModel().getColumn(j).setCellRenderer( centerRenderer );
+            }
 
             table.setFont(new Font("Consolas", Font.PLAIN, 15));
 
@@ -301,6 +278,8 @@ public class StudentPanel extends JFrame implements ActionListener {
 
             semResultPanel.add(semLabel);
             semResultPanel.add(tablePane);
+
+
         }
 
 
@@ -318,15 +297,7 @@ public class StudentPanel extends JFrame implements ActionListener {
 
 
     private void showInfoPane() throws SQLException {
-        if (modulesPane != null) {
-            bottomPanel.remove(modulesPane);
-        }
-        if (resultPane != null) {
-            bottomPanel.remove(resultPane);
-        }
-        if(infoPanel!=null){
-            bottomPanel.remove(infoPanel);
-        }
+        refresh();
 
         infoPanel = new JPanel();
         infoPanel.setLayout(new GridLayout(9, 5));
@@ -353,9 +324,7 @@ public class StudentPanel extends JFrame implements ActionListener {
             JTextField textContact = new JTextField(rs.getString("contact"));
 
 
-            JLabel stdEnrolledCourse = new JLabel("Enrolled Course");
-            JTextField textEnrolledCourse = new JTextField(rs.getString("enrolledCourse"));
-            textEnrolledCourse.setEnabled(false);
+
 
             JLabel stdRemarks = new JLabel("Remarks");
             JTextField textRemarks = new JTextField(rs.getString("studentRemarks"));
@@ -364,6 +333,16 @@ public class StudentPanel extends JFrame implements ActionListener {
             JLabel stdLevel = new JLabel("Level");
             JTextField textLevel = new JTextField(rs.getString("studentLevel"));
             textLevel.setEnabled(false);
+
+            JLabel stdEnrolledCourse = new JLabel("Enrolled Course");
+            int courseId = rs.getInt("enrolledCourse");
+            ResultSet rs2 = DBCRUD.getCourseData(courseId);
+            JTextField textEnrolledCourse = null;
+            if(rs2.next()){
+                textEnrolledCourse = new JTextField(rs2.getString("courseName"));
+            }
+
+            textEnrolledCourse.setEnabled(false);
 
             JButton stdEdit = new JButton("Edit");
 
@@ -377,9 +356,9 @@ public class StudentPanel extends JFrame implements ActionListener {
                     st.setPassword(textPassword.getText());
 
                     if(DBCRUD.updateStudentData(st)){
-                        System.out.println("Updated!");
+                        JOptionPane.showMessageDialog(null, "Information Updated Successfully!", "Updated", JOptionPane.INFORMATION_MESSAGE);
                     }else{
-                        System.out.println("Not Updated");
+                        JOptionPane.showMessageDialog(null, "Information could not be updated!", "Error", JOptionPane.ERROR_MESSAGE);
                     }
                 }
             });
@@ -464,10 +443,6 @@ public class StudentPanel extends JFrame implements ActionListener {
     }
 
 
-
-
-
-
     @Override
     public void actionPerformed(ActionEvent e) {
         try{
@@ -490,7 +465,4 @@ public class StudentPanel extends JFrame implements ActionListener {
 
     }
 
-//    public static void main(String[] args) {
-//        new StudentPanel("Magus");
-//    }
 }

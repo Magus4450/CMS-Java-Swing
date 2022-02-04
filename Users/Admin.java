@@ -3,7 +3,6 @@ package Users;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import static DBHelpers.DBCRUD.getAdminData;
 import static DBHelpers.DBCRUD.loginAdmin;
 
 
@@ -39,9 +38,6 @@ public class Admin{
         return id;
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
 
     public boolean login(){
         ResultSet rs = loginAdmin(getUsername(), getPassword());

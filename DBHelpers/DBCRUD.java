@@ -2,10 +2,6 @@ package DBHelpers;
 
 import Users.Student;
 import Users.Teacher;
-import com.mysql.cj.protocol.Resultset;
-
-import javax.swing.plaf.nimbus.State;
-import javax.xml.transform.Result;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -17,7 +13,7 @@ public class DBCRUD {
 
     Connection connection;
     static Statement statement;
-
+    
     DBCRUD(){
         connection = DBUtils.getDBConnection();
         try{
@@ -27,6 +23,7 @@ public class DBCRUD {
             e.printStackTrace();
         }
     }
+    
     public static boolean insertIntoStudent(String[] data){
         try{
             System.out.println(Arrays.toString(data));
@@ -104,14 +101,13 @@ public class DBCRUD {
 
             String sql = String.format("""
                 INSERT INTO `%s`.`COURSE` (
-                    `courseId`,
                     `courseName`,
                     `courseDuration`,
                     `courseSemesters`,
                     `courseIsAvailable`,
                     `courseModules`)
                 VALUES (
-                  "%s","%s","%s","%s","%s","%s");""", dbName, data[0], data[1], data[2],data[3],data[4],data[5]);
+                  "%s","%s","%s","%s","%s");""", dbName, data[1], data[2],data[3],data[4],data[5]);
             statement.executeUpdate(sql);
 
         } catch (SQLException e){
@@ -253,6 +249,7 @@ public class DBCRUD {
             return null;
         }
     }
+
     public static int getCourseId(String courseName){
         try{
             String sql = String.format("""
@@ -337,6 +334,33 @@ public class DBCRUD {
         return getAllData("STUDENT");
     }
     public static ResultSet getAllModuleData(){return  getAllData("MODULE");}
+
+    public static ResultSet getAllOptionalModule(int isOptional){
+        try{
+            String sql = String.format("""
+                SELECT * FROM `%s`.`MODULE` WHERE `isOptional` = %s;""", dbName, isOptional);
+
+            return statement.executeQuery(sql);
+
+        } catch (SQLException e){
+            System.out.println("Course Data couldn't be fetched");
+            e.printStackTrace();
+            return null;
+        }
+    }
+    public static ResultSet getAllActiveCourse(){
+        try{
+            String sql = String.format("""
+                SELECT * FROM `%s`.`COURSE` WHERE `courseIsAvailable` = 1;""", dbName);
+
+            return statement.executeQuery(sql);
+
+        } catch (SQLException e){
+            System.out.println("Course Data couldn't be fetched");
+            e.printStackTrace();
+            return null;
+        }
+    }
 
     public static ResultSet getAllData(String tableName){
 

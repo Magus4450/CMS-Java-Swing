@@ -1,7 +1,6 @@
 package GUI;
 
 import javax.swing.*;
-import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -10,9 +9,7 @@ import java.awt.event.ActionListener;
 public class Register extends JFrame implements ActionListener {
 
     JPanel panel;
-    JLabel user_label, password_label, message, title_label;
-    JTextField user_text;
-    JPasswordField password_text;
+    JLabel title_label;
     JButton goNext, back;
     JRadioButton adminBtn, studentBtn, teacherBtn;
     ButtonGroup group;
@@ -56,7 +53,7 @@ public class Register extends JFrame implements ActionListener {
         title_label.setBounds(60, 20, 200, 20);
         studentBtn.setBounds(60, 70, 80, 30);
         teacherBtn.setBounds(140, 70, 80, 30);
-        adminBtn.setBounds(220, 70, 80, 30);
+//        adminBtn.setBounds(220, 70, 80, 30);
         goNext.setBounds(200, 130, 150, 30);
         back.setBounds(30, 130, 150, 30);
 
@@ -75,7 +72,7 @@ public class Register extends JFrame implements ActionListener {
 
         panel.add(studentBtn);
         panel.add(teacherBtn);
-        panel.add(adminBtn);
+//        panel.add(adminBtn);
         panel.add(goNext);
         panel.add(back);
 
@@ -97,23 +94,15 @@ public class Register extends JFrame implements ActionListener {
         this.setVisible(true);
     }
 
-    public static void main(String[] args) {
-        new Register();
-    }
     @Override
     public void actionPerformed(ActionEvent e) {
         if( e.getSource() == goNext){
             if (studentBtn.isSelected()){
-                System.out.println("Student");
                 this.dispose();
-                new RegisterForm("STUDENT");
+                new RegisterForm("STUDENT", null);
             } else if (teacherBtn.isSelected()){
-                System.out.println("Teacher");
-                this.dispose();
-                new RegisterForm("TEACHER");
-            }else if (adminBtn.isSelected()){
                 JOptionPane.showMessageDialog(null, "Please contact administration to register as an admin.", "Admin Register", JOptionPane.INFORMATION_MESSAGE);
-                System.out.println("Admin");
+
             }
 
         } else if (e.getSource() == back){

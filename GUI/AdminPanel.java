@@ -1,20 +1,12 @@
 package GUI;
 
 import DBHelpers.DBCRUD;
-import DBHelpers.DBUtils;
 import Users.Admin;
-import Users.Student;
 import Users.Teacher;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
-import javax.swing.plaf.TableUI;
 import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableModel;
-import javax.xml.transform.Result;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -22,8 +14,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Vector;
+
+
 
 public class AdminPanel extends JFrame implements ActionListener {
 
@@ -31,14 +24,10 @@ public class AdminPanel extends JFrame implements ActionListener {
     JScrollPane teachersPane,studentsPane, coursesPane;
     JButton logOutBtn, teachersBtn, studentsBtn, coursesBtn;
     JLabel welcomeLabel;
-    String[] modules = {};
-    ArrayList<Integer> teacherModulesSem = new ArrayList<>();
-    ArrayList<String> teacherModules = new ArrayList<>();
 
     AdminPanel ap = this;
 
 
-    //    Vector columnNames, data;
     final int HEIGHT = 490;
     final int WIDTH = 1200;
     final int ROW_HEIGHT = HEIGHT/7;
@@ -196,8 +185,7 @@ public class AdminPanel extends JFrame implements ActionListener {
         table.getColumnModel().getColumn(0).setPreferredWidth(100);
         table.getColumnModel().getColumn(1).setPreferredWidth(380);
         table.getColumnModel().getColumn(2).setPreferredWidth(100);
-//        table.getColumnModel().getColumn(3).setPreferredWidth(100);
-//        table.getColumnModel().getColumn(4).setPreferredWidth(200);
+
 
         DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
         centerRenderer.setVerticalAlignment( JLabel.CENTER );
@@ -220,7 +208,9 @@ public class AdminPanel extends JFrame implements ActionListener {
 
         courseEditPanel = new JPanel(null);
         JButton addCourseBtn = new JButton("Add Course");
+        JButton addModuleBtn = new JButton("Add Module");
         addCourseBtn.setBounds(20,10,200,30);
+        addModuleBtn.setBounds(250, 10, 200 ,30);
         addCourseBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -231,10 +221,20 @@ public class AdminPanel extends JFrame implements ActionListener {
                 }
             }
         });
+        addModuleBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    addModule();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
 
 
         courseEditPanel.add(addCourseBtn);
-//        teacherEditPanel.setBackground(Color.red);
+        courseEditPanel.add(addModuleBtn);
         courseEditPanel.setBounds(200, HEIGHT-ROW_HEIGHT-50, WIDTH-200, 50);
 
         bottomPanel.add(courseEditPanel);
@@ -248,19 +248,14 @@ public class AdminPanel extends JFrame implements ActionListener {
         System.out.println(courseName);
         ResultSet rs = null;
         ArrayList<String> courseModules = null;
-        if(!isForNew){
-            rs = DBCRUD.getCourseData(courseId);
-            String courseMod = "";
-            if (rs.next()){
-                courseMod = rs.getString("courseModules");
-            }
-            courseModules = new ArrayList<>(Arrays.asList(courseMod.split(" ")));
+
+        rs = DBCRUD.getCourseData(courseId);
+        String courseMod = "";
+        if (rs.next()){
+            courseMod = rs.getString("courseModules");
         }
+        courseModules = new ArrayList<>(Arrays.asList(courseMod.split(" ")));
 
-
-//        JScrollPane pane = new JScrollPane(infoPanel);
-//        pane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-//        pane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
         JFrame editCoursesFrame = new JFrame();
 
@@ -280,8 +275,13 @@ public class AdminPanel extends JFrame implements ActionListener {
         editCoursesFrame.setLocationRelativeTo(null);
         editCoursesFrame.setLayout(null);
 
-
-        JLabel editCoursesTitle = new JLabel("Edit Course");
+        String titleTxt;
+        if(isForNew){
+            titleTxt = "Add Course";
+        }else{
+            titleTxt = "Edit Course";
+        }
+        JLabel editCoursesTitle = new JLabel(titleTxt);
         editCoursesTitle.setFont(new Font("Consolas", Font.BOLD, 20));
         editCoursePanel.add(editCoursesTitle);
         editCoursePanel.add(new JLabel(""));
@@ -298,6 +298,7 @@ public class AdminPanel extends JFrame implements ActionListener {
         ArrayList<JTextField> editNamesCode = new ArrayList<>();
         ArrayList<JTextField> editNamesText = new ArrayList<>();
         ArrayList<JComboBox<String>> editComboBox = new ArrayList<>();
+        ArrayList<JComboBox<String>> editComboBoxElective = new ArrayList<>();
 
         editCoursePanel.add(editCoursesName);
         editCoursePanel.add(editCoursesNameText);
@@ -331,9 +332,9 @@ public class AdminPanel extends JFrame implements ActionListener {
             JLabel editCourseM;
             if(i >= 16){
                 if(i >= 22){
-                    editCourseM = new JLabel("Semester 6");
+                    editCourseM = new JLabel("Semester 6 (Elective)");
                 }else if (i >= 20) {
-                    editCourseM = new JLabel("Semester 5");
+                    editCourseM = new JLabel("Semester 5 (Elective)");
                 }else if (i >= 18) {
                     editCourseM = new JLabel("Semester 6");
                 }else{
@@ -347,6 +348,7 @@ public class AdminPanel extends JFrame implements ActionListener {
             JTextField editCourseMCode = new JTextField();
             JTextField editCourseMText = new JTextField();
             JComboBox<String> moduleCodeBox = null;
+            JComboBox<String> electiveModuleCodeBox = null;
 
             editCourseMText.setPreferredSize(new Dimension(200,30));
             editCourseMText.setMaximumSize(new Dimension(200,30));
@@ -359,19 +361,29 @@ public class AdminPanel extends JFrame implements ActionListener {
             }else{
                 editCourseMText.setEnabled(false);
                 // For New
-                rs = DBCRUD.getAllModuleData();
+                rs = DBCRUD.getAllOptionalModule(0);
                 ArrayList<String> allModuleCode = new ArrayList<>();
                 ArrayList<String> allModule = new ArrayList<>();
+                ArrayList<String> allModuleCodeElective = new ArrayList<>();
+                ArrayList<String> allModuleElective = new ArrayList<>();
                 while (rs.next()){
                     allModuleCode.add(rs.getString("moduleCode"));
                     allModule.add(rs.getString("moduleName"));
 
                 }
+                rs = DBCRUD.getAllOptionalModule(1);
+                while (rs.next()){
+                    allModuleCodeElective.add(rs.getString("moduleCode"));
+                    allModuleElective.add(rs.getString("moduleName"));
+
+                }
                 moduleCodeBox = new JComboBox<>();
+                electiveModuleCodeBox = new JComboBox<>();
 //                JComboBox<String> moduleBox = new JComboBox<>();
                 if(i < 8){
 
                     for(int j = 0 ; j < allModuleCode.size(); j++){
+
                         if (allModuleCode.get(j).charAt(0)== '4') {
                             moduleCodeBox.addItem(allModuleCode.get(j));
                         }
@@ -382,25 +394,48 @@ public class AdminPanel extends JFrame implements ActionListener {
                             moduleCodeBox.addItem(allModuleCode.get(j));
                         }
                     }
-                }else{
+                }else if(i < 20){
                     for(int j = 0 ; j < allModuleCode.size(); j++){
                         if (allModuleCode.get(j).charAt(0)== '6') {
                             moduleCodeBox.addItem(allModuleCode.get(j));
+                        }
+                    }
+                }else{
+                    for(int j = 0 ; j < allModuleCodeElective.size(); j++){
+                        if (allModuleCodeElective.get(j).charAt(0)== '6') {
+                            electiveModuleCodeBox.addItem(allModuleCodeElective.get(j));
                         }
                     }
                 }
 
                 moduleCodeBox.setPreferredSize(new Dimension(200,30));
                 moduleCodeBox.setMaximumSize(new Dimension(200,30));
-                editComboBox.add(moduleCodeBox);
-                JComboBox<String> finalModuleCodeBox = moduleCodeBox;
+                if(i<20){
+                    editComboBox.add(moduleCodeBox);
+
+                }else{
+                    editComboBoxElective.add(electiveModuleCodeBox);
+                }
                 moduleCodeBox.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        String currentCode = (String) finalModuleCodeBox.getSelectedItem();
-                        int index = editComboBox.indexOf(finalModuleCodeBox);
-                        System.out.println(index);
+                        JComboBox<String> currentBox = (JComboBox<String>)e.getSource();
+                        String currentCode = (String) currentBox.getSelectedItem();
+                        int index = editComboBox.indexOf(currentBox);
+
                         editNamesText.get(index).setText(allModule.get(allModuleCode.indexOf(currentCode)));
+
+                    }
+                });
+                electiveModuleCodeBox.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        JComboBox<String> currentBox = (JComboBox<String>)e.getSource();
+                        String currentCode = (String) currentBox.getSelectedItem();
+                        int index = editComboBoxElective.indexOf(currentBox) + 20;
+
+                        editNamesText.get(index).setText(allModuleElective.get(allModuleCodeElective.indexOf(currentCode)));
+
                     }
                 });
 
@@ -417,27 +452,53 @@ public class AdminPanel extends JFrame implements ActionListener {
                 editCoursePanel.add(editCourseMCode);
                 editCoursePanel.add(editCourseMText);
 
-                editNames.add(editCourseM);
-                editNamesCode.add(editCourseMCode);
-                editNamesText.add(editCourseMText);
             } else{
+
                 editCoursePanel.add(editCourseM);
-                editCoursePanel.add(moduleCodeBox);
+                if(i < 20){
+                    editCoursePanel.add(moduleCodeBox);
+
+                }else{
+                    editCoursePanel.add(electiveModuleCodeBox);
+                }
                 editCoursePanel.add(editCourseMText);
 
-                editNames.add(editCourseM);
-                editNamesCode.add(editCourseMCode);
-                editNamesText.add(editCourseMText);
             }
+            editNames.add(editCourseM);
+            editNamesCode.add(editCourseMCode);
+            editNamesText.add(editCourseMText);
 
         }
         String btnText = (isForNew) ? "Add" : "Edit";
         JButton editBtn = new JButton(btnText);
 
+        JButton deleteBtn = new JButton("Delete");
+        deleteBtn.setForeground(new Color(75, 17, 17));
+
+        deleteBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int result = JOptionPane.showConfirmDialog(null,
+                        "Are you sure you want to delete this course?",
+                        "Delete Course",
+                        JOptionPane.YES_NO_OPTION);
+                if(result == JOptionPane.YES_OPTION){
+                    System.out.println("BRUH");
+                }else if (result == JOptionPane.NO_OPTION){
+                    System.out.println("Nice");;
+                }
+            }
+        });
+
 
         JLabel message = new JLabel("");
         editCoursePanel.add(message);
-        editCoursePanel.add(new JLabel(""));
+        if(isForNew){
+            editCoursePanel.add(new JLabel(""));
+
+        }else{
+            editCoursePanel.add(deleteBtn);
+        }
         editCoursePanel.add(editBtn);
 
 
@@ -446,22 +507,46 @@ public class AdminPanel extends JFrame implements ActionListener {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String editedCourseName = editCoursesNameText.getText();
+                System.out.println("COurseName: " + editedCourseName);
+                ArrayList<String> modulesToAdd = new ArrayList<>();
                 if(editedCourseName.equals("")){
                     message.setText("Fields cannot be empty");
                     return;
                 }
                 int isAvailable = (editCourseAvailabilityText.getSelectedItem() == "Yes") ? 1 : 0;
+                System.out.println("Isava: " + isAvailable);
                 if(!isForNew){
                     DBCRUD.updateCourseData(courseId, editedCourseName, isAvailable);
                 }
                 for(int i = 0; i < 24; i++) {
-                    if(editNamesCode.get(i).getText().equals("") || editNamesText.get(i).getText().equals("")){
-                        message.setText("Fields cannot be empty");
-                        return;
-                    }
+
                     if(!isForNew){
+                        if(editNamesCode.get(i).getText().equals("") || editNamesText.get(i).getText().equals("")){
+                            message.setText("Fields cannot be empty");
+                            return;
+                        }
                         DBCRUD.updateModuleData(editNamesCode.get(i).getText(), editNamesText.get(i).getText());
+                    }else{
+                        if(editNamesText.get(i).getText().equals("")){
+                            System.out.println((i+1)+">"+editNamesText.get(i).getText());
+                            message.setText("Fields cannot be empty");
+                            return;
+                        }
+                        if(modulesToAdd.contains((String)editComboBox.get(i).getSelectedItem())){
+                            System.out.println(modulesToAdd.toString());
+                            System.out.println(editNamesCode.get(i).getText());
+                            message.setText("Duplicate Modules");
+                            return;
+                        }
+                        modulesToAdd.add((String)editComboBox.get(i).getSelectedItem());
                     }
+                }
+                if(isForNew){
+                    String finalModules = modulesToAdd.toString().replace("[","").replace("]","").replace(",","");
+                    System.out.println(">"+finalModules+"<");
+
+                    String[] insertData = {null, editedCourseName, "3", "6", Integer.toString(isAvailable), finalModules};
+                    DBCRUD.insertIntoCourse(insertData);
                 }
 
                 editCoursesFrame.dispose();
@@ -492,9 +577,167 @@ public class AdminPanel extends JFrame implements ActionListener {
 
     }
 
+    private void addModule() throws SQLException {
 
 
-    private void showTeachersPanel() throws SQLException {
+
+        JFrame addModuleFrame = new JFrame();
+
+        JPanel addModulePanel = new JPanel();
+
+        addModulePanel.setVisible(true);
+        GridLayout gl = new GridLayout(8,3);
+        gl.setHgap(10);
+        gl.setVgap(20);
+        addModulePanel.setLayout(gl);
+        addModulePanel.setBorder(new EmptyBorder(10,30,10,30));
+
+
+        addModuleFrame.setVisible(true);
+        addModuleFrame.setResizable(false);
+        addModuleFrame.setSize(1000,500);
+        addModuleFrame.setLocationRelativeTo(null);
+        addModuleFrame.setLayout(null);
+
+
+        JLabel editCoursesTitle = new JLabel("Add Module");
+        editCoursesTitle.setFont(new Font("Consolas", Font.BOLD, 20));
+        addModulePanel.add(editCoursesTitle);
+        addModulePanel.add(new JLabel(""));
+        addModulePanel.add(new JLabel(""));
+
+        JComboBox<String> levelBox = new JComboBox<>();
+        levelBox.addItem("4");
+        levelBox.addItem("5");
+        levelBox.addItem("6");
+
+        JTextField addModuleCodeText = new JTextField();
+        JTextField addModuleNameText = new JTextField();
+
+        levelBox.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                addModuleCodeText.setText((String) levelBox.getSelectedItem());
+            }
+        });
+
+        addModulePanel.add(new JLabel("Level"));
+        addModulePanel.add(levelBox);
+        addModulePanel.add(new JLabel(""));
+
+        JComboBox<Integer> sem = new JComboBox<>();
+        sem.addItem(1);
+        sem.addItem(2);
+        sem.setSelectedItem(1);
+        addModulePanel.add(new JLabel("Semester"));
+        addModulePanel.add(sem);
+        addModulePanel.add(new JLabel(""));
+
+
+
+        addModulePanel.add(new JLabel("Module Code"));
+        addModulePanel.add(addModuleCodeText);
+        addModulePanel.add(new JLabel(""));
+
+        addModulePanel.add(new JLabel("Module Name"));
+        addModulePanel.add(addModuleNameText);
+        addModulePanel.add(new JLabel(""));
+
+        JComboBox<String> isOptional = new JComboBox<>();
+        isOptional.addItem("Yes");
+        isOptional.addItem("No");
+        isOptional.setSelectedItem("No");
+
+        addModulePanel.add(new JLabel("Optional"));
+        addModulePanel.add(isOptional);
+        addModulePanel.add(new JLabel(""));
+
+        JButton addBtn = new JButton("Add");
+
+
+        JLabel message = new JLabel("");
+        addModulePanel.add(message);
+        addModulePanel.add(new JLabel(""));
+        addModulePanel.add(addBtn);
+
+
+        addBtn.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String level = (String)levelBox.getSelectedItem();
+                String moduleCode = addModuleCodeText.getText();
+                String moduleName = addModuleNameText.getText();
+                String optional = (String)isOptional.getSelectedItem();
+
+                int semester = (Integer)sem.getSelectedItem();
+
+                if(level.equals("") || moduleName.equals("") || moduleCode.equals("")){
+                    message.setText("Fields cannot be empty");
+                    return;
+                }
+                if(moduleCode.charAt(0) != level.charAt(0)){
+                    message.setText("Module Code must start with level");
+                    return;
+                }
+                if(!level.equals("6") && optional.equals("Yes")){
+                    message.setText("Optional Module can only be set for level 6.");
+                    return;
+                }
+                if(!moduleName.contains("(Elective)")){
+                    moduleName = moduleName + " (Elective)";
+                }
+
+                try{
+                    ResultSet rs = DBCRUD.getAllModuleData();
+                    ArrayList<String> allModules = new ArrayList<>();
+                    ArrayList<String> allCodes = new ArrayList<>();
+                    while(rs.next()){
+                        allModules.add(rs.getString("moduleName"));
+                        allCodes.add(rs.getString("moduleCode"));
+                    }
+                    if(allCodes.contains(moduleCode)){
+                        message.setText("Module Code already in use");
+                        return;
+                    }
+                    if(allModules.contains(moduleName)){
+                        message.setText("Module Name already in use");
+                        return;
+                    }
+                }catch (SQLException er){
+                    er.printStackTrace();
+                }
+                int finalSem = (level.equals("6")) ? 4 + semester : (level.equals("5") ? 2 + semester : semester);
+                String[] moduleData = {moduleCode, moduleName, level, "20", (optional.equals("Yes")) ? "1" : "0", Integer.toString(finalSem), "null", "0"};
+                System.out.println(Arrays.toString(moduleData));
+                DBCRUD.insertIntoModule(moduleData);
+
+                addModuleFrame.dispose();
+                ap.dispose();
+                try {
+                    new AdminPanel(a);
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+
+            }
+        });
+
+
+
+
+        JScrollPane pane = new JScrollPane(addModulePanel);
+        pane.setBounds(0, 0, 980, 500);
+        pane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        pane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        addModuleFrame.add(pane, BorderLayout.CENTER);
+
+
+    }
+
+
+
+    public void showTeachersPanel() throws SQLException {
 
         refresh();
 
@@ -539,16 +782,14 @@ public class AdminPanel extends JFrame implements ActionListener {
         table.getColumnModel().getColumn(1).setPreferredWidth(380);
         table.getColumnModel().getColumn(2).setPreferredWidth(100);
         table.getColumnModel().getColumn(3).setPreferredWidth(300);
-//        table.getColumnModel().getColumn(4).setPreferredWidth(200);
 
         DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
         centerRenderer.setVerticalAlignment( JLabel.CENTER );
         centerRenderer.setHorizontalAlignment( JLabel.CENTER );
-        table.getColumnModel().getColumn(0).setCellRenderer( centerRenderer );
-        table.getColumnModel().getColumn(1).setCellRenderer( centerRenderer );
-        table.getColumnModel().getColumn(2).setCellRenderer( centerRenderer );
-        table.getColumnModel().getColumn(3).setCellRenderer( centerRenderer );
-//        table.getColumnModel().getColumn(4).setCellRenderer( centerRenderer );
+        for(int i = 0; i < columnNames.size(); i ++){
+            table.getColumnModel().getColumn(i).setCellRenderer( centerRenderer );
+        }
+
 
         table.setFont(new Font("Consolas", Font.PLAIN, 15));
 
@@ -562,6 +803,16 @@ public class AdminPanel extends JFrame implements ActionListener {
         teacherEditPanel = new JPanel(null);
         JButton addTeacherBtn = new JButton("Add Teacher");
         addTeacherBtn.setBounds(20,10,200,30);
+
+        addTeacherBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new RegisterForm("TEACHER", a);
+                ap.dispose();
+
+            }
+        });
+
         teacherEditPanel.add(addTeacherBtn);
 //        teacherEditPanel.setBackground(Color.red);
         teacherEditPanel.setBounds(200, HEIGHT-ROW_HEIGHT-50, WIDTH-200, 50);
@@ -580,6 +831,7 @@ public class AdminPanel extends JFrame implements ActionListener {
         while(rs.next()){
             allModules.add(rs.getString("moduleCode"));
         }
+
 
         rs = DBCRUD.getTeacherData(username);
         if(rs.next()){
@@ -786,15 +1038,6 @@ public class AdminPanel extends JFrame implements ActionListener {
         }
 
         JTable table = new JTable(data, columnNames){
-            public Class getColumnClass(int column){
-                for(int row =0; row<getRowCount(); row++){
-                    Object o = getValueAt(row, column);
-                    if(o!= null){
-                        return o.getClass();
-                    }
-                }
-                return Object.class;
-            }
 
             @Override
             public boolean isCellEditable(int row, int col) {
@@ -814,12 +1057,9 @@ public class AdminPanel extends JFrame implements ActionListener {
         DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
         centerRenderer.setVerticalAlignment( JLabel.CENTER );
         centerRenderer.setHorizontalAlignment( JLabel.CENTER );
-        table.getColumnModel().getColumn(0).setCellRenderer( centerRenderer );
-        table.getColumnModel().getColumn(1).setCellRenderer( centerRenderer );
-        table.getColumnModel().getColumn(2).setCellRenderer( centerRenderer );
-        table.getColumnModel().getColumn(3).setCellRenderer( centerRenderer );
-        table.getColumnModel().getColumn(4).setCellRenderer( centerRenderer );
-//        table.getColumnModel().getColumn(4).setCellRenderer( centerRenderer );
+        for(int i = 0; i < columnNames.size(); i ++){
+            table.getColumnModel().getColumn(i).setCellRenderer( centerRenderer );
+        }
 
         table.setFont(new Font("Consolas", Font.PLAIN, 15));
 

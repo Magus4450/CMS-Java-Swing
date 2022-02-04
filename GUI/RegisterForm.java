@@ -2,9 +2,9 @@ package GUI;
 
 
 import DBHelpers.DBCRUD;
+import Users.Admin;
 import Users.Student;
 import Users.Teacher;
-import com.mysql.cj.log.Log;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -23,13 +23,12 @@ public class RegisterForm extends JFrame implements ActionListener {
     JTextField user_text, first_text, last_text, address_text, contact_text;
     JPasswordField password_text, cPassword_text;
     JButton register, back;
-    JRadioButton adminBtn, studentBtn, teacherBtn;
     String userType;
+    Admin a;
 
+    RegisterForm(String userType, Admin a){
 
-    RegisterForm(String userType){
-
-
+        this.a = a;
         this.userType = userType;
         // Title Label
         title_label = new JLabel();
@@ -160,9 +159,6 @@ public class RegisterForm extends JFrame implements ActionListener {
         this.setVisible(true);
     }
 
-    public static void main(String[] args) {
-        new RegisterForm("STUDENT");
-    }
     @Override
     public void actionPerformed(ActionEvent e) {
         if( e.getSource() == back){
@@ -214,12 +210,18 @@ public class RegisterForm extends JFrame implements ActionListener {
                     System.out.println("Teacher Registered");
                     this.dispose();
                     JOptionPane.showMessageDialog(null, "You have been registered successfully.", "Registered", JOptionPane.INFORMATION_MESSAGE);
-                    new Login();
+                    AdminPanel ap = null;
+                    try {
+                        ap = new AdminPanel(a);
+                        ap.showTeachersPanel();
+
+                    } catch (SQLException ex) {
+                        ex.printStackTrace();
+                    }
+
                 }
             }
 
-
-            System.out.println("Registered");
         }
 
     }

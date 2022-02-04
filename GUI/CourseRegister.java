@@ -3,15 +3,12 @@ package GUI;
 
 import DBHelpers.DBCRUD;
 import Users.Student;
-import Users.Teacher;
-import com.mysql.cj.log.Log;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.Array;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -45,10 +42,9 @@ public class CourseRegister extends JFrame implements ActionListener {
         coursePanel = new JPanel();
         coursePanel.setLayout(new BoxLayout(coursePanel, BoxLayout.Y_AXIS));
         coursePanel.setBackground(Color.white);
-//        coursePanel.setBorder(new EmptyBorder(0,10,0,10));
 
         ArrayList<JButton> btns = new ArrayList<>();
-        ResultSet rs = DBCRUD.getAllCourseData();
+        ResultSet rs = DBCRUD.getAllActiveCourse();
         try{
             while(rs.next()){
                 bj = new JButton(rs.getString("courseName"));
@@ -95,9 +91,6 @@ public class CourseRegister extends JFrame implements ActionListener {
         this.setVisible(true);
     }
 
-    public static void main(String[] args) {
-//        new CourseRegister();
-    }
     @Override
     public void actionPerformed(ActionEvent e) {
 

@@ -162,7 +162,7 @@ public class DBUtils {
             // courseModules -> Store id of modules
             String sql = String.format("""
                     CREATE TABLE `%s`.`COURSE` (
-                      `courseId` INT NOT NULL,
+                      `courseId` INT NOT NULL AUTO_INCREMENT,
                       `courseName` VARCHAR(100) NOT NULL,
                       `courseDuration` INT NOT NULL,
                       `courseSemesters` INT NOT NULL,

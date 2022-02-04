@@ -3,12 +3,9 @@ package GUI;
 
 import DBHelpers.DBCRUD;
 import Users.Student;
-import Users.Teacher;
-import com.mysql.cj.log.Log;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -45,8 +42,8 @@ public class CourseInfo extends JFrame implements ActionListener {
         enroll = new JButton("ENROLL");
 
         title_label.setBounds(50, 20, 300, 20);
-        back.setBounds(30, 380, 140, 30);
-        enroll.setBounds(200, 380, 140 ,30);
+        back.setBounds(80, 380, 140, 30);
+        enroll.setBounds(250, 380, 140 ,30);
 
 
 
@@ -70,28 +67,53 @@ public class CourseInfo extends JFrame implements ActionListener {
             semester.setFont(new Font("Consolas", Font.BOLD, 16));
 
             infoPanel.add(semester);
-            for(int i = index; i < index +4 ; i ++){
-                module = modules[i];
-                System.out.println(module);
-                rs  = DBCRUD.getModuleData(module);
+            if(sem <= 4){
+                for(int i = index; i < index +4 ; i ++){
+                    module = modules[i];
+                    System.out.println(module);
+                    rs  = DBCRUD.getModuleData(module);
 
-                if(rs.next()){
-                    infoPanel.add(new JLabel(rs.getString("moduleName")));
+                    if(rs.next()){
+                        infoPanel.add(new JLabel(rs.getString("moduleName")));
 
+                    }
                 }
+                index+=4;
+            }else{
+                for(int i = index; i < index +2 ; i ++){
+                    module = modules[i];
+                    rs  = DBCRUD.getModuleData(module);
+
+                    if(rs.next()){
+                        infoPanel.add(new JLabel(rs.getString("moduleName")));
+
+                    }
+                }
+                infoPanel.add(new JLabel("(Elective)"));
+                index+=2;
             }
-            index+=4;
+
 
             infoPanel.add(Box.createRigidArea(new Dimension(10,10)));
         }
+        JLabel electivesLabel = new JLabel("Electives");
+        electivesLabel.setFont(new Font("Consolas", Font.BOLD, 16));
+        infoPanel.add(electivesLabel);
+        for(int i = index; i < index+4; i++){
+            module = modules[i];
+            rs  = DBCRUD.getModuleData(module);
+            if(rs.next()){
+                infoPanel.add(new JLabel(rs.getString("moduleName").replace("(Elective)","")));
+
+            }
+        }
+
 
 
         JScrollPane pane = new JScrollPane(infoPanel);
         pane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         pane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-//        pane.setBorder(new LineBorder(Color.black));
-//        pane.setBorder(new EmptyBorder(0, 20, 0, 20));
-        pane.setBounds(40,70, 300, 280);
+        pane.setBounds(40,70, 400, 280);
 
 
         panel.add(pane);
@@ -105,7 +127,7 @@ public class CourseInfo extends JFrame implements ActionListener {
 
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setTitle("Login");
-        this.setSize(400, 480);
+        this.setSize(500, 480);
         // Center the window
         this.setLocationRelativeTo(null);
 

@@ -5,15 +5,12 @@ import Users.Student;
 import Users.Teacher;
 
 import javax.swing.*;
-import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.SQLException;
 
-import static DBHelpers.DBCRUD.*;
-import static DBHelpers.DBUtils.*;
 
 public class Login extends JFrame implements ActionListener {
 
@@ -157,7 +154,7 @@ public class Login extends JFrame implements ActionListener {
                         ex.printStackTrace();
                     }
                 }else {
-                    System.out.println("Wrong Std Creds!");
+                    message.setText("Incorrect Credentials");
                 }
             } else if(teacherBtn.isSelected()){
                 Teacher t = new Teacher(userName, password);
@@ -170,7 +167,7 @@ public class Login extends JFrame implements ActionListener {
                     }
                     System.out.println("Teacher logged in!");
                 }else{
-                    System.out.println("Teacher Wrong Creds!");
+                    message.setText("Incorrect Credentials");
                 }
             } else if(adminBtn.isSelected()){
                 Admin a = new Admin(userName, password);
@@ -185,7 +182,7 @@ public class Login extends JFrame implements ActionListener {
                 if(a.login()){
                     System.out.println("Admin Logged In!");
                 }else {
-                    System.out.println("Admin Wrong Creds!");
+                    message.setText("Incorrect Credentials");
                 }
             }
 
