@@ -21,19 +21,26 @@ import java.util.Vector;
 
 public class TeacherPanel extends JFrame implements ActionListener {
 
-    JPanel topPanel, bottomPanel, menuPanel, modulesInfoPanel, infoPanel;
-    JScrollPane modulesPane,resultPane;
-    JButton logOutBtn, modulesBtn, resultBtn, infoBtn;
-    JLabel welcomeLabel;
-    ArrayList<Integer> teacherModulesSem = new ArrayList<>();
-    ArrayList<String> teacherModules = new ArrayList<>();
+    private final JPanel bottomPanel;
+    private JPanel infoPanel;
+    private JScrollPane modulesPane,resultPane;
+    private final JButton logOutBtn;
+    private final JButton modulesBtn;
+    private final JButton resultBtn;
+    private final JButton infoBtn;
+    private final ArrayList<Integer> teacherModulesSem = new ArrayList<>();
+    private ArrayList<String> teacherModules = new ArrayList<>();
 
 
-    //    Vector columnNames, data;
-    final int HEIGHT = 490;
-    final int WIDTH = 1200;
-    final int ROW_HEIGHT = HEIGHT/7;
-    Teacher t;
+
+    private final int HEIGHT = 490;
+    private final int WIDTH = 1200;
+    private final int ROW_HEIGHT = HEIGHT/7;
+    private final Teacher t;
+
+    private final Font titleFont = new Font("Bahnschrift", Font.PLAIN, 20);
+    private final Font titleFont2 = new Font("Bahnschrift", Font.BOLD, 14);
+    private final Font normalFont = new Font("Bahnschrift", Font.PLAIN, 13);
 
     TeacherPanel(Teacher t) throws SQLException {
         this.t = t;
@@ -43,20 +50,20 @@ public class TeacherPanel extends JFrame implements ActionListener {
         this.setLocationRelativeTo(null);
 
 
-
-        topPanel = new JPanel();
+        JPanel topPanel = new JPanel();
         topPanel.setBounds(0,0,WIDTH,ROW_HEIGHT);
         topPanel.setBackground(new Color(204, 204, 204));
         topPanel.setLayout(null);
 
-        welcomeLabel = new JLabel();
+        JLabel welcomeLabel = new JLabel();
         welcomeLabel.setText("Welcome, " + t.getFirstName());
-        welcomeLabel.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 15));
+        welcomeLabel.setFont(titleFont);
         welcomeLabel.setBounds(25,15,300,45);
 
 //
 
         logOutBtn = new JButton("Logout");
+        logOutBtn.setFont(normalFont);
         logOutBtn.setFocusable(false);
         logOutBtn.setBounds(1070,17,100,40);
         logOutBtn.addActionListener(this);
@@ -71,19 +78,21 @@ public class TeacherPanel extends JFrame implements ActionListener {
         bottomPanel.setBackground(new Color(241, 241, 241));
 
 
-
-        menuPanel = new JPanel();
+        JPanel menuPanel = new JPanel();
         menuPanel.setBounds(0, 0, 200,HEIGHT-ROW_HEIGHT);
         menuPanel.setBackground(new Color(109, 176, 109));
         menuPanel.setLayout(new GridLayout(6,1));
 
         modulesBtn = new JButton("Modules");
+        modulesBtn.setFont(normalFont);
         modulesBtn.setSelected(true);
 
 
         resultBtn = new JButton("Result");
+        resultBtn.setFont(normalFont);
 
         infoBtn = new JButton("View Info");
+        infoBtn.setFont(normalFont);
 
 
         modulesBtn.addActionListener(this);
@@ -94,7 +103,7 @@ public class TeacherPanel extends JFrame implements ActionListener {
         menuPanel.add(resultBtn);
         menuPanel.add(infoBtn);
 
-        modulesInfoPanel = new JPanel();
+        JPanel modulesInfoPanel = new JPanel();
         modulesInfoPanel.setBackground(new Color(96, 178, 190));
         modulesInfoPanel.setBorder(new EmptyBorder(0,10,0,10));
 
@@ -141,8 +150,8 @@ public class TeacherPanel extends JFrame implements ActionListener {
         }
 
         Vector<String> columnNames = new Vector<>();
-        columnNames.add("moduleCode");
-        columnNames.add("moduleName");
+        columnNames.add("Module Code");
+        columnNames.add("Module Name");
         columnNames.add("Level");
         columnNames.add("Semester");
         columnNames.add("Students");
@@ -214,8 +223,9 @@ public class TeacherPanel extends JFrame implements ActionListener {
         table.getColumnModel().getColumn(3).setCellRenderer( centerRenderer );
         table.getColumnModel().getColumn(4).setCellRenderer( centerRenderer );
 
-        table.setFont(new Font("Consolas", Font.PLAIN, 15));
-//        table.setEnabled(false);
+        table.getTableHeader().setFont(titleFont2);
+        table.setFont(normalFont);
+
 
 
 
@@ -357,8 +367,8 @@ public class TeacherPanel extends JFrame implements ActionListener {
         }
 
 
-        table.setFont(new Font("Consolas", Font.PLAIN, 15));
-//        table.setEnabled(false);
+        table.getTableHeader().setFont(titleFont2);
+        table.setFont(normalFont);
 
         modulesPane = new JScrollPane(table);
         modulesPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
@@ -382,26 +392,39 @@ public class TeacherPanel extends JFrame implements ActionListener {
         ResultSet rs = DBCRUD.getTeacherData(t.getUsername());
         if (rs.next()) {
             JLabel tFirstName = new JLabel("First Name");
+            tFirstName.setFont(normalFont);
             JTextField textFirstName = new JTextField(rs.getString("firstName"));
+            textFirstName.setFont(normalFont);
 
             JLabel tLastName = new JLabel("Last Name");
+            tLastName.setFont(normalFont);
             JTextField textLastName = new JTextField(rs.getString("lastName"));
+            textLastName.setFont(normalFont);
 
             JLabel tPassword = new JLabel("Password");
+            tPassword.setFont(normalFont);
             JTextField textPassword = new JTextField(rs.getString("password"));
+            textPassword.setFont(normalFont);
 
             JLabel tUsername = new JLabel("Username");
+            tUsername.setFont(normalFont);
             JTextField textUsername = new JTextField(rs.getString("username"));
+            textUsername.setFont(normalFont);
             textUsername.setEnabled(false);
 
             JLabel tAddress = new JLabel("Address");
+            tAddress.setFont(normalFont);
             JTextField textAddress = new JTextField(rs.getString("address"));
+            textAddress.setFont(normalFont);
 
             JLabel tContact = new JLabel("Contact");
+            tContact.setFont(normalFont);
             JTextField textContact = new JTextField(rs.getString("contact"));
+            textContact.setFont(normalFont);
 
 
             JButton tEdit = new JButton("Edit");
+            tEdit.setFont(normalFont);
 
             tEdit.addActionListener(new ActionListener() {
                 @Override

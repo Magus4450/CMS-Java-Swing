@@ -22,13 +22,13 @@ public class Login extends JFrame implements ActionListener {
     JRadioButton adminBtn, studentBtn, teacherBtn;
 
 
-
     public Login(){
 
         // Title Label
         title_label = new JLabel();
         title_label.setText("LOGIN");
-        title_label.setFont(new Font("Comic Sans", Font.BOLD, 20));
+        Font titleFont = new Font("Bahnschrift", Font.BOLD, 20);
+        title_label.setFont(titleFont);
 
         // User Label
         user_label = new JLabel();
@@ -38,7 +38,9 @@ public class Login extends JFrame implements ActionListener {
 
         user_label.setIcon(new ImageIcon(userNewImg));
         user_text = new JTextField();
-        user_text.setText("admin");
+        Font normalFont = new Font("Bahnschrift", Font.PLAIN, 13);
+        user_text.setFont(normalFont);
+        user_text.setText("apple");
 
 
         // Password
@@ -50,14 +52,18 @@ public class Login extends JFrame implements ActionListener {
 
         password_label.setIcon(new ImageIcon(passNewImg));
         password_text = new JPasswordField();
-        password_text.setText("admin");
+        password_text.setFont(new Font("Bahnschrift", Font.BOLD, 13));
+        password_text.setText("apple");
 
 
         // Radio Buttons
 
         studentBtn = new JRadioButton("Student");
+        studentBtn.setFont(normalFont);
         teacherBtn = new JRadioButton("Teacher");
+        teacherBtn.setFont(normalFont);
         adminBtn = new JRadioButton("Admin");
+        adminBtn.setFont(normalFont);
 
 //        studentBtn.setBounds();
         studentBtn.addActionListener(this);
@@ -73,13 +79,16 @@ public class Login extends JFrame implements ActionListener {
 
         // Message
         message = new JLabel();
+        message.setFont(normalFont);
 
 
         // Login
         login = new JButton("LOGIN");
-
+        login.setFont(normalFont);
         // Register
         register = new JButton("REGISTER");
+        register.setFont(normalFont);
+
 
         title_label.setBounds(60, 20, 100, 20);
         user_label.setBounds(60,60,30,30);

@@ -28,59 +28,88 @@ public class RegisterForm extends JFrame implements ActionListener {
 
     RegisterForm(String userType, Admin a){
 
+        Font titleFont = new Font("Bahnschrift", Font.BOLD, 20);
+        Font normalFont = new Font("Bahnschrift", Font.PLAIN, 13);
+        Font passwordFont = new Font("Bahnschrift", Font.BOLD, 13);
         this.a = a;
         this.userType = userType;
         // Title Label
         title_label = new JLabel();
         title_label.setText(userType +" REGISTER");
-        title_label.setFont(new Font("Comic Sans", Font.BOLD, 20));
+        title_label.setFont(titleFont);
 
         // Username Label
         user_label = new JLabel();
         user_label.setText("Username");
+        user_label.setFont(normalFont);
         user_text = new JTextField();
+        user_text.setFont(normalFont);
 
         // First and Last Name
         first_label = new JLabel();
+        first_label.setFont(normalFont);
+
         first_label.setText("First Name");
         first_text = new JTextField();
+        first_text.setFont(normalFont);
+
 
         last_label = new JLabel();
+        last_label.setFont(normalFont);
+
         last_label.setText("Last Name");
         last_text = new JTextField();
+        last_text.setFont(normalFont);
 
         // Address and Contact
         contact_label = new JLabel();
+        contact_label.setFont(normalFont);
+
         contact_label.setText("Contact");
         contact_text = new JTextField();
+        contact_text.setFont(normalFont);
 
         address_label = new JLabel();
+        address_label.setFont(normalFont);
+
         address_label.setText("Address");
         address_text = new JTextField();
+        address_text.setFont(normalFont);
 
 
 
         // Password
         password_label = new JLabel();
+        password_label.setFont(normalFont);
+
         password_label.setText("Password");
         password_text = new JPasswordField();
+        password_text.setFont(passwordFont);
+
 
         // Confirm Password
 
         cPassword_label = new JLabel();
+        cPassword_label.setFont(normalFont);
+
         cPassword_label.setText("Confirm");
         cPassword_text = new JPasswordField();
+        cPassword_text.setFont(passwordFont);
+
 
 
         // Message
         message = new JLabel();
+        message.setFont(normalFont);
 
 
         // Register
         register = new JButton("REGISTER");
+        register.setFont(normalFont);
 
         // Back
         back = new JButton("BACK");
+        back.setFont(normalFont);
 
         title_label.setBounds(80, 20, 300, 20);
 

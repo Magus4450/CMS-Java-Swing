@@ -1,7 +1,10 @@
 package Users;
+import DBHelpers.DBCRUD;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static DBHelpers.DBCRUD.*;
@@ -21,7 +24,7 @@ public class Student extends User {
     public Student(String username, String password, String firstName, String lastName, String address, String contact){
         super(username, password, firstName, lastName,address, contact);
         this.level = 4;
-        this.remarks = null;
+        this.remarks = "null null null null null null";
         this.marks = "TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD";
         this.enrolledModules = null;
     }
@@ -29,7 +32,7 @@ public class Student extends User {
     public Student(String username, String password, String firstName, String lastName, String address, String contact, String level, String remarks){
         super(username, password, firstName, lastName,address, contact);
         this.level = Integer.parseInt(level);
-        this.remarks = remarks;
+        this.remarks = "null null null null null null";
         this.marks = "TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD";
         this.enrolledModules = null;
     }
@@ -38,6 +41,33 @@ public class Student extends User {
 
         super(username, password);
         login();
+    }
+    public Student(String username){
+        super(username);
+        ResultSet rs = DBCRUD.getStudentData(getUsername());
+        try{
+            if(rs.next()){
+
+                setPassword(rs.getString("password"));
+                setFirstName(rs.getString("firstName"));
+                setLastName(rs.getString("lastName"));
+                setAddress(rs.getString("address"));
+                setContact(rs.getString("contact"));
+                setEnrolledCourse(rs.getInt("enrolledCourse"));
+                setPassedSem(rs.getInt("passedSem"));
+                setLevel(rs.getInt("studentLevel"));
+                setMarks(rs.getString("marks"));
+                setEnrolledModules(rs.getString("enrolledModules"));
+                setRemarks(rs.getString("studentRemarks"));
+
+            }
+
+
+
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+
     }
 
     public void setLevel(int level) {
@@ -77,10 +107,9 @@ public class Student extends User {
                 setLevel(rs.getInt("studentLevel"));
                 setMarks(rs.getString("marks"));
                 setEnrolledModules(rs.getString("enrolledModules"));
+                setRemarks(rs.getString("studentRemarks"));
 
-                if(getUsername().equals(username) && getPassword().equals(password)){
-                    return true;
-                }
+                return getUsername().equals(username) && getPassword().equals(password);
             }
             return false;
 
@@ -91,15 +120,53 @@ public class Student extends User {
         return false;
     }
 
-    public static void main(String[] args) {
-        //
+    public void promoteSem() throws SQLException {
+        setPassedSem(getPassedSem()+1);
+
+        ArrayList<String> allModules = null;
+        ArrayList<String> enrolledModules = new ArrayList<>(Arrays.asList(getEnrolledModules().split(" ")));
+
+        ResultSet rs = DBCRUD.getCourseData(getEnrolledCourse());
+
+        if(rs.next()){
+            allModules = new ArrayList<>(Arrays.asList(rs.getString("courseModules").split(" ")));
+        }
+        assert allModules != null;
+        if(getPassedSem() < 4){
+            int start = 4*getPassedSem();
+            for(int i = 0; i < 4; i++){
+                enrolledModules.add(allModules.get(start + i));
+            }
+        }else if (getPassedSem() == 4){
+            int start = 16;
+            for(int i = 0; i < 2; i++){
+                enrolledModules.add(allModules.get(start + i));
+            }
+            enrolledModules.add("(Elective)");
+        }else if (getPassedSem() == 5){
+            int start = 18;
+            for(int i = 0; i < 2; i++){
+                enrolledModules.add(allModules.get(start + i));
+            }
+            enrolledModules.add("(Elective)");
+        }
+
+        setEnrolledModules(enrolledModules.toString().replace("[","").replace("]","").replace(",",""));
+
+        if(getPassedSem()<2){
+            setLevel(4);
+        }else if(getPassedSem()<4){
+            setLevel(5);
+        }else{
+            setLevel(6);
+        }
     }
 
     public void setMarksModule(String moduleCode, int mark){
         String[] s = enrolledModules.split(" ");
         String[] m = marks.split(" ");
-        ArrayList<String> modules = new ArrayList<String>(List.of(s));
-        ArrayList<String> marks = new ArrayList<String>(List.of(m));
+        ArrayList<String> modules = new ArrayList<>(List.of(s));
+        ArrayList<String> marks = new ArrayList<>(List.of(m));
         for(String module: modules){
             if (module.equals(moduleCode)){
                 marks.set(modules.indexOf(module),Integer.toString(mark));

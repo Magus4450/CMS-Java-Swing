@@ -3,18 +3,16 @@ package DBHelpers;
 import javax.swing.*;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.net.ConnectException;
 import java.sql.*;
-import java.util.Arrays;
 import java.util.Scanner;
 
 import static DBHelpers.DBCRUD.*;
 
 public class DBUtils {
 
-    static final String url = "jdbc:mysql://localhost:3306/";
-    static final String user = "root";
-    static final String password = "Poophead009";
+    private static final String url = "jdbc:mysql://localhost:3306/";
+    private static final String user = "root";
+    private static final String password = "Poophead009";
 
     private boolean isDataDumped = false;
 
@@ -30,7 +28,6 @@ public class DBUtils {
             System.out.println("Connection Established");
             new DBCRUD();
         } catch (Exception e) {
-            System.out.println("SQL Server is Offline!");
             JOptionPane.showMessageDialog(null, "SQL Server is Offline. Please turn on the server to run the program.", "Admin Register", JOptionPane.INFORMATION_MESSAGE);
 
         }
@@ -59,7 +56,6 @@ public class DBUtils {
 
     private void createTables() {
 
-//        this.createUserTable();
         this.createTeacherTable();
         this.createStudentTable();
         this.createAdminTable();

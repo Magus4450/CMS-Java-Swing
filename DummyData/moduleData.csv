@@ -29,11 +29,11 @@
 6CS030,Big Data,6,20,0,5,teacher1,1
 6CS005,High Performance Computing,6,20,0,5,teacher2,1
 6CS007,Project and Professionalism,6,20,0,5,teacher1,2
-6CS014,Complex Systems,6,20,0,6,teacher2,2
+6CS014,Complex Systems,6,20,0,5,teacher2,2
 6MM026,Financial Mathematics and Data Analysis,6,20,0,6,teacher3,1
 6MM029,Multivariate Statistics with Cybermetrics,6,20,0,6,teacher4,1
 6CS012,Artificial Intelligence and Machine Learning,6,20,0,6,teacher5,2
-6CS027,Secure Mobile Application Development,6,20,0,5,teacher6,2
+6CS027,Secure Mobile Application Development,6,20,0,6,teacher6,2
 6CS025,Advanced Games Technologies and Programming (Elective),6,20,1,5,teacher7,1
 6CS028,Advanced Web Development (Elective),6,20,1,5,teacher8,1
 6CS035,Game Development (Elective),6,20,1,5,teacher9,2

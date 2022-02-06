@@ -21,15 +21,19 @@ public class CourseRegister extends JFrame implements ActionListener {
     Student st;
     public CourseRegister(Student st){
 
+        Font titleFont = new Font("Bahnschrift", Font.BOLD, 20);
+        Font normalFont = new Font("Bahnschrift", Font.PLAIN, 13);
+
         this.st = st;
         // Title Label
         title_label = new JLabel();
         title_label.setText("COURSE REGISTER");
-        title_label.setFont(new Font("Comic Sans", Font.BOLD, 20));
+        title_label.setFont(titleFont);
 
 
         // Back
         back = new JButton("BACK");
+        back.setFont(normalFont);
 
         title_label.setBounds(80, 20, 300, 20);
         back.setBounds(30, 380, 140, 30);
@@ -48,6 +52,7 @@ public class CourseRegister extends JFrame implements ActionListener {
         try{
             while(rs.next()){
                 bj = new JButton(rs.getString("courseName"));
+                bj.setFont(normalFont);
                 bj.setMaximumSize(new Dimension(300, 50));
                 bj.setPreferredSize(new Dimension(300, 50));
                 bj.setFocusable(false);

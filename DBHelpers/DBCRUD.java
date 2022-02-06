@@ -2,6 +2,7 @@ package DBHelpers;
 
 import Users.Student;
 import Users.Teacher;
+import Modules.Module;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -11,11 +12,10 @@ import java.util.Arrays;
 import static DBHelpers.DBUtils.*;
 public class DBCRUD {
 
-    Connection connection;
-    static Statement statement;
+    private static Statement statement;
     
     DBCRUD(){
-        connection = DBUtils.getDBConnection();
+        Connection connection = DBUtils.getDBConnection();
         try{
             statement = connection.createStatement();
 
@@ -24,9 +24,8 @@ public class DBCRUD {
         }
     }
     
-    public static boolean insertIntoStudent(String[] data){
+    public static void insertIntoStudent(String[] data){
         try{
-            System.out.println(Arrays.toString(data));
             String sql = String.format("""
             INSERT INTO `%s`.`STUDENT` (
                 `studentLevel`,
@@ -45,16 +44,13 @@ public class DBCRUD {
               %s,"%s","%s","%s","%s","%s","%s","%s","%s","%s","%s","%s");""", dbName, data[1], data[2],data[3],data[4],data[5],data[6],data[7],data[8],data[9],data[10],data[11],data[12]);
 
             statement.executeUpdate(sql);
-            return true;
 
         } catch (SQLException e){
             e.printStackTrace();
         }
-        return false;
     }
 
-    public static boolean insertIntoTeacher(String[] data){
-        System.out.println(Arrays.toString(data));
+    public static void insertIntoTeacher(String[] data){
         try{
 
             String sql = String.format("""
@@ -69,15 +65,13 @@ public class DBCRUD {
                 VALUES (
                   "%s","%s","%s","%s","%s","%s","%s");""", dbName, data[1], data[2],data[3],data[4],data[5],data[6],data[7]);
             statement.executeUpdate(sql);
-            return true;
 
         } catch (SQLException e){
             e.printStackTrace();
         }
-        return false;
     }
 
-    public static boolean insertIntoAdmin(String[] data){
+    public static void insertIntoAdmin(String[] data){
         try{
 
             String sql = String.format("""
@@ -88,12 +82,10 @@ public class DBCRUD {
                 VALUES (
                   "%s","%s","%s");""", dbName, data[0], data[1], data[2]);
             statement.executeUpdate(sql);
-            return true;
 
         } catch (SQLException e){
             e.printStackTrace();
         }
-        return false;
     }
 
     public static void insertIntoCourse(String[] data){
@@ -153,7 +145,6 @@ public class DBCRUD {
         try{
             String sql = String.format("""
                 SELECT * FROM `%s`.`%s` WHERE `username` = "%s" AND `password` = "%s";""", dbName, userType, username, password);
-            System.out.println(sql);
             return statement.executeQuery(sql);
 
         } catch (SQLException e){
@@ -176,7 +167,6 @@ public class DBCRUD {
         try{
             String sql = String.format("""
                 SELECT * FROM `%s`.`%s` WHERE `username` = "%s";""", dbName, userType, username);
-            System.out.println(sql);
             return statement.executeQuery(sql);
 
         } catch (SQLException e){
@@ -281,28 +271,24 @@ public class DBCRUD {
             return null;
         }
     }
-    public static boolean updateModuleData(String moduleCode, String moduleName){
+    public static void updateModuleData(Module m){
         try{
             String sql = String.format("""
                 UPDATE `%s`.`MODULE`
                 SET
-                    `moduleName` = "%s"
-                WHERE `moduleCode` = "%s";""", dbName, moduleName, moduleCode);
-            int count = statement.executeUpdate(sql);
-            System.out.println("Rows Affected: " + count);
-            return (count > 0);
-
+                    `moduleName` = "%s",
+                    `moduleTeacher` = "%s"
+                WHERE `moduleCode` = "%s";""", dbName, m.getModuleName(), m.getModuleTeacher(), m.getModuleCode());
+            statement.executeUpdate(sql);
 
         } catch (SQLException e){
             System.out.println("Course Data couldn't be fetched");
             e.printStackTrace();
-
         }
-        return false;
 
     }
 
-    public static boolean updateCourseData(int courseId, String courseName, int isCourseAvailable){
+    public static void updateCourseData(int courseId, String courseName, int isCourseAvailable){
         try{
             String sql = String.format("""
                 UPDATE `%s`.`COURSE`
@@ -310,18 +296,13 @@ public class DBCRUD {
                     `courseName` = "%s",
                     `courseIsAvailable` = %s
                 WHERE `courseId` = %s;""", dbName, courseName, isCourseAvailable, courseId);
-            System.out.println(sql);
             int count = statement.executeUpdate(sql);
-            System.out.println("Rows Affected: " + count);
-            return (count > 0);
-
 
         } catch (SQLException e){
             System.out.println("Course Data couldn't be fetched");
             e.printStackTrace();
 
         }
-        return false;
     }
 
     public static ResultSet getAllCourseData(){
@@ -334,7 +315,32 @@ public class DBCRUD {
         return getAllData("STUDENT");
     }
     public static ResultSet getAllModuleData(){return  getAllData("MODULE");}
+    public static ResultSet getAllNonEmptyModuleData(){
+        try{
+            String sql = String.format("""
+                SELECT * FROM `%s`.`MODULE` WHERE `moduleTeacher` != "null";""", dbName);
 
+            return statement.executeQuery(sql);
+
+        } catch (SQLException e){
+            System.out.println("Course Data couldn't be fetched");
+            e.printStackTrace();
+            return null;
+        }
+    }
+    public static ResultSet getAllModuleData(int semester, int isOptional){
+        try{
+            String sql = String.format("""
+                SELECT * FROM `%s`.`MODULE` WHERE `moduleSem` = %s AND `isOptional` = %s;""", dbName, semester, isOptional);
+
+            return statement.executeQuery(sql);
+
+        } catch (SQLException e){
+            System.out.println("Course Data couldn't be fetched");
+            e.printStackTrace();
+            return null;
+        }
+    }
     public static ResultSet getAllOptionalModule(int isOptional){
         try{
             String sql = String.format("""
@@ -389,11 +395,11 @@ public class DBCRUD {
                     `contact` = "%s",
                     `passedSem` = %s,
                     `studentLevel` = %s,
-                    `marks` = "%s"
-                WHERE `username` = "%s";""", dbName, st.getFirstName(), st.getLastName(), st.getPassword(), st.getAddress(), st.getContact(), st.getPassedSem(), st.getLevel(), st.getMarks(),st.getUsername());
-            System.out.println(sql);
+                    `marks` = "%s",
+                    `studentRemarks` = "%s",
+                    `enrolledModules` = "%s"
+                WHERE `username` = "%s";""", dbName, st.getFirstName(), st.getLastName(), st.getPassword(), st.getAddress(), st.getContact(), st.getPassedSem(), st.getLevel(), st.getMarks(),st.getRemarks(), st.getEnrolledModules(), st.getUsername());
             int count = statement.executeUpdate(sql);
-            System.out.println("Rows Affected: " + count);
             return (count > 0);
 
         } catch (SQLException e){
@@ -416,9 +422,7 @@ public class DBCRUD {
                     `contact` = "%s",
                     `teacherModules` = "%s"
                 WHERE `username` = "%s";""", dbName, t.getFirstName(), t.getLastName(), t.getPassword(), t.getAddress(), t.getContact(),t.getTeacherModules(),t.getUsername());
-            System.out.println(sql);
             int count = statement.executeUpdate(sql);
-            System.out.println("Rows Affected: " + count);
             return (count > 0);
 
         } catch (SQLException e){
@@ -495,22 +499,23 @@ public class DBCRUD {
 
     }
 
+    public static void deleteCourseData(String courseName){
+        try{
+            String sql = String.format("""
+                DELETE FROM `%s`.`COURSE` WHERE `courseName` = "%s";""", dbName, courseName);
+            int rows = statement.executeUpdate(sql);
 
 
+        } catch (SQLException e){
+            System.out.println("User couldn't be logged in!");
+            e.printStackTrace();
 
-
-
-
-    public static void main(String[] args) {
-//        ResultSet rs = getCourseData("BSc(Hons) Computer Science");
-//        try{
-//            if(rs.next()){
-//                System.out.println(rs.toString());
-//            }
-//        } catch (SQLException e){
-//            e.printStackTrace();
-//        }
-
+        }
     }
+
+
+
+
+
 
 }

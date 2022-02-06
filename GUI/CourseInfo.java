@@ -22,6 +22,11 @@ public class CourseInfo extends JFrame implements ActionListener {
     Student st;
     int courseId;
     public CourseInfo(Student st, int courseId) throws SQLException {
+
+        Font titleFont = new Font("Bahnschrift", Font.BOLD, 20);
+        Font titleFont2 = new Font("Bahnschrift", Font.BOLD, 15);
+        Font normalFont = new Font("Bahnschrift", Font.PLAIN, 13);
+
         this.st = st;
         this.courseId = courseId;
 
@@ -29,17 +34,20 @@ public class CourseInfo extends JFrame implements ActionListener {
         ResultSet rs = DBCRUD.getCourseData(courseId);
         if (rs.next()){
             title_label = new JLabel(rs.getString("courseName"));
+
         }
 
-        title_label.setFont(new Font("Comic Sans", Font.BOLD, 20));
+        title_label.setFont(titleFont);
 
 
         // Back
         back = new JButton("BACK");
+        back.setFont(normalFont);
 
 
         //Enroll
         enroll = new JButton("ENROLL");
+        enroll.setFont(normalFont);
 
         title_label.setBounds(50, 20, 300, 20);
         back.setBounds(80, 380, 140, 30);
@@ -64,7 +72,7 @@ public class CourseInfo extends JFrame implements ActionListener {
         int index = 0;
         for(int sem = 1; sem <= 6; sem++) {
             semester = new JLabel("Semester " + sem);
-            semester.setFont(new Font("Consolas", Font.BOLD, 16));
+            semester.setFont(titleFont2);
 
             infoPanel.add(semester);
             if(sem <= 4){
@@ -74,7 +82,9 @@ public class CourseInfo extends JFrame implements ActionListener {
                     rs  = DBCRUD.getModuleData(module);
 
                     if(rs.next()){
-                        infoPanel.add(new JLabel(rs.getString("moduleName")));
+                        JLabel mod = new JLabel(rs.getString("moduleName"));
+                        mod.setFont(normalFont);
+                        infoPanel.add(mod);
 
                     }
                 }
@@ -85,11 +95,15 @@ public class CourseInfo extends JFrame implements ActionListener {
                     rs  = DBCRUD.getModuleData(module);
 
                     if(rs.next()){
-                        infoPanel.add(new JLabel(rs.getString("moduleName")));
+                        JLabel mod = new JLabel(rs.getString("moduleName"));
+                        mod.setFont(normalFont);
+                        infoPanel.add(mod);
 
                     }
                 }
-                infoPanel.add(new JLabel("(Elective)"));
+                JLabel elective = new JLabel("(Elective)");
+                elective.setFont(normalFont);
+                infoPanel.add(elective);
                 index+=2;
             }
 
@@ -97,13 +111,15 @@ public class CourseInfo extends JFrame implements ActionListener {
             infoPanel.add(Box.createRigidArea(new Dimension(10,10)));
         }
         JLabel electivesLabel = new JLabel("Electives");
-        electivesLabel.setFont(new Font("Consolas", Font.BOLD, 16));
+        electivesLabel.setFont(titleFont2);
         infoPanel.add(electivesLabel);
         for(int i = index; i < index+4; i++){
             module = modules[i];
             rs  = DBCRUD.getModuleData(module);
             if(rs.next()){
-                infoPanel.add(new JLabel(rs.getString("moduleName").replace("(Elective)","")));
+                JLabel electMod = new JLabel(rs.getString("moduleName").replace("(Elective)",""));
+                electMod.setFont(normalFont);
+                infoPanel.add(electMod);
 
             }
         }
