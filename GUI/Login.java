@@ -10,28 +10,31 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.SQLException;
+import java.util.Objects;
 
 
 public class Login extends JFrame implements ActionListener {
 
-    JPanel panel;
-    JLabel user_label, password_label, message, title_label;
-    JTextField user_text;
-    JPasswordField password_text;
-    JButton login, register;
-    JRadioButton adminBtn, studentBtn, teacherBtn;
+    private final JLabel message;
+    private final JTextField user_text;
+    private final JPasswordField password_text;
+    private final JButton login;
+    private final JButton register;
+    private final JRadioButton adminBtn;
+    private final JRadioButton studentBtn;
+    private final JRadioButton teacherBtn;
 
 
     public Login(){
 
         // Title Label
-        title_label = new JLabel();
+        JLabel title_label = new JLabel();
         title_label.setText("LOGIN");
         Font titleFont = new Font("Bahnschrift", Font.BOLD, 20);
         title_label.setFont(titleFont);
 
         // User Label
-        user_label = new JLabel();
+        JLabel user_label = new JLabel();
         ImageIcon userIcon = new ImageIcon("src/Images/user.png");
         Image userImg = userIcon.getImage();
         Image userNewImg = userImg.getScaledInstance(20, 20, Image.SCALE_SMOOTH);
@@ -40,12 +43,12 @@ public class Login extends JFrame implements ActionListener {
         user_text = new JTextField();
         Font normalFont = new Font("Bahnschrift", Font.PLAIN, 13);
         user_text.setFont(normalFont);
-        user_text.setText("apple");
+        user_text.setText("Username");
 
 
         // Password
 
-        password_label = new JLabel();
+        JLabel password_label = new JLabel();
         ImageIcon passIcon = new ImageIcon("src/Images/pass.png");
         Image passImg = passIcon.getImage();
         Image passNewImg = passImg.getScaledInstance(20, 20, Image.SCALE_SMOOTH);
@@ -53,7 +56,6 @@ public class Login extends JFrame implements ActionListener {
         password_label.setIcon(new ImageIcon(passNewImg));
         password_text = new JPasswordField();
         password_text.setFont(new Font("Bahnschrift", Font.BOLD, 13));
-        password_text.setText("apple");
 
 
         // Radio Buttons
@@ -103,11 +105,7 @@ public class Login extends JFrame implements ActionListener {
         register.setBounds(30, 200, 150, 30);
 
 
-
-
-
-
-        panel = new JPanel(null);
+        JPanel panel = new JPanel(null);
         panel.setBorder(new EmptyBorder(10,10,10,10));
 
 

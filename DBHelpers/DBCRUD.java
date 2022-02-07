@@ -1,13 +1,14 @@
 package DBHelpers;
 
+import Modules.Course;
 import Users.Student;
 import Users.Teacher;
 import Modules.Module;
+
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Arrays;
 
 import static DBHelpers.DBUtils.*;
 public class DBCRUD {
@@ -159,9 +160,7 @@ public class DBCRUD {
     public static ResultSet getTeacherData(String username){
         return getData(username, "TEACHER");
     }
-    public static ResultSet getAdminData(String username){
-        return getData(username, "ADMIN");
-    }
+
 
     private static ResultSet getData(String username, String userType){
         try{
@@ -277,8 +276,9 @@ public class DBCRUD {
                 UPDATE `%s`.`MODULE`
                 SET
                     `moduleName` = "%s",
-                    `moduleTeacher` = "%s"
-                WHERE `moduleCode` = "%s";""", dbName, m.getModuleName(), m.getModuleTeacher(), m.getModuleCode());
+                    `moduleTeacher` = "%s",
+                    `courseId` = "%s"
+                WHERE `moduleCode` = "%s";""", dbName, m.getModuleName(), m.getModuleTeacher(),m.getCourseId(), m.getModuleCode());
             statement.executeUpdate(sql);
 
         } catch (SQLException e){
@@ -288,15 +288,32 @@ public class DBCRUD {
 
     }
 
-    public static void updateCourseData(int courseId, String courseName, int isCourseAvailable){
+    public static int getCourseCount(){
         try{
+            String sql = String.format("""
+                SELECT count(*) FROM `%s`.`COURSE`;""", dbName);
+            ResultSet rs = statement.executeQuery(sql);
+            if(rs.next()){
+                return rs.getInt("count(*)");
+            }
+
+        } catch (SQLException e){
+            System.out.println("Course Data couldn't be fetched");
+            e.printStackTrace();
+        }
+        return -1;
+    }
+
+    public static void updateCourseData(Course c){
+        try{
+
             String sql = String.format("""
                 UPDATE `%s`.`COURSE`
                 SET
                     `courseName` = "%s",
                     `courseIsAvailable` = %s
-                WHERE `courseId` = %s;""", dbName, courseName, isCourseAvailable, courseId);
-            int count = statement.executeUpdate(sql);
+                WHERE `courseId` = %s;""", dbName, c.getCourseName(), c.getAvailable(), c.getCourseId());
+            statement.executeUpdate(sql);
 
         } catch (SQLException e){
             System.out.println("Course Data couldn't be fetched");
@@ -477,19 +494,9 @@ public class DBCRUD {
     public static ResultSet getModules(String enrolledCourse, int sem){
 
         try{
-            String sql = String.format("""
-                SELECT courseId FROM `%s`.`COURSE` WHERE `courseName` = "%s";""", dbName, enrolledCourse);
+            String sql = "SELECT * FROM `"+dbName+"`.`MODULE` WHERE `moduleSem` = "+ sem +" AND `courseId` LIKE concat('%','"+enrolledCourse+"','%')";
 
-            ResultSet rs = statement.executeQuery(sql);
-            int courseId = 0;
-            if(rs.next()){
-                courseId = rs.getInt("courseId");
-            }
-            sql = String.format("""
-                SELECT * FROM `%s`.`MODULE` WHERE `courseId` = %s AND `moduleSem` = %s;""", dbName, courseId, sem);
-
-            rs = statement.executeQuery(sql);
-            return rs;
+            return statement.executeQuery(sql);
 
         } catch (SQLException e){
             System.out.println("User couldn't be logged in!");
@@ -499,11 +506,28 @@ public class DBCRUD {
 
     }
 
+    public static boolean isCourseAvailable(int courseId){
+        try{
+
+            String sql = String.format("""
+                    SELECT * FROM `%s`.`COURSE` WHERE `courseId` =  %s;""", dbName, courseId);
+            ResultSet rs = statement.executeQuery(sql);
+            if(rs.next()){
+                return true;
+            }
+        } catch (SQLException e){
+            System.out.println("Course Data couldn't be fetched");
+            e.printStackTrace();
+
+        }
+        return false;
+    }
+
     public static void deleteCourseData(String courseName){
         try{
             String sql = String.format("""
                 DELETE FROM `%s`.`COURSE` WHERE `courseName` = "%s";""", dbName, courseName);
-            int rows = statement.executeUpdate(sql);
+            statement.executeUpdate(sql);
 
 
         } catch (SQLException e){

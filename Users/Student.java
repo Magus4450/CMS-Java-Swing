@@ -32,9 +32,9 @@ public class Student extends User {
     public Student(String username, String password, String firstName, String lastName, String address, String contact, String level, String remarks){
         super(username, password, firstName, lastName,address, contact);
         this.level = Integer.parseInt(level);
-        this.remarks = "null null null null null null";
         this.marks = "TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD TBD";
         this.enrolledModules = null;
+        this.remarks = remarks;
     }
 
     public Student(String username, String password){
@@ -128,6 +128,7 @@ public class Student extends User {
 
         ResultSet rs = DBCRUD.getCourseData(getEnrolledCourse());
 
+        assert rs != null;
         if(rs.next()){
             allModules = new ArrayList<>(Arrays.asList(rs.getString("courseModules").split(" ")));
         }
@@ -142,13 +143,15 @@ public class Student extends User {
             for(int i = 0; i < 2; i++){
                 enrolledModules.add(allModules.get(start + i));
             }
-            enrolledModules.add("(Elective)");
+            enrolledModules.add("(Elective1)");
+            enrolledModules.add("(Elective2)");
         }else if (getPassedSem() == 5){
             int start = 18;
             for(int i = 0; i < 2; i++){
                 enrolledModules.add(allModules.get(start + i));
             }
-            enrolledModules.add("(Elective)");
+            enrolledModules.add("(Elective1)");
+            enrolledModules.add("(Elective2)");
         }
 
         setEnrolledModules(enrolledModules.toString().replace("[","").replace("]","").replace(",",""));

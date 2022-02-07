@@ -3,7 +3,7 @@ package Modules;
 
 import DBHelpers.DBCRUD;
 
-import javax.xml.transform.Result;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -15,18 +15,20 @@ public class Module {
     private int isOptional;
     private int moduleSem;
     private String moduleTeacher;
-    private int courseId;
+    private String courseId;
 
     public Module(String moduleCode) throws SQLException {
         ResultSet rs = DBCRUD.getModuleData(moduleCode);
         setModuleCode(moduleCode);
+        assert rs != null;
         if(rs.next()){
             setModuleName(rs.getString("moduleName"));
             setModuleLevel(rs.getInt("moduleLevel"));
             setModuleCredit(rs.getInt("moduleCredit"));
             setIsOptional(rs.getInt("isOptional"));
             setModuleSem(rs.getInt("moduleSem"));
-            setCourseId(rs.getInt("courseId"));
+            setCourseId(rs.getString("courseId"));
+            setModuleTeacher(rs.getString("moduleTeacher"));
 
         }
     }
@@ -87,14 +89,13 @@ public class Module {
 
     public void setModuleTeacher(String moduleTeacher) {
         this.moduleTeacher = moduleTeacher;
-//        DBCRUD.updateModuleData(getModuleCode(),getModuleName())
     }
 
-    public int getCourseId() {
+    public String getCourseId() {
         return courseId;
     }
 
-    public void setCourseId(int courseId) {
+    public void setCourseId(String courseId) {
         this.courseId = courseId;
     }
 }

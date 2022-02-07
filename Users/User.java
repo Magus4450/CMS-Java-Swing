@@ -4,7 +4,6 @@ public abstract class User {
 
     private String username;
     private String password;
-    private int id;
     private String firstName;
     private String lastName;
     private String address;
@@ -40,12 +39,6 @@ public abstract class User {
         this.username = username;
     }
 
-    public int getId() {
-        return id;
-    }
-    public void setId(int id) {
-        this.id = id;
-    }
 
     public String getFirstName() {
         return firstName;

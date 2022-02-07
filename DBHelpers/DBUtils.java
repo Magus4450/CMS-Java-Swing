@@ -11,25 +11,23 @@ import static DBHelpers.DBCRUD.*;
 public class DBUtils {
 
     private static final String url = "jdbc:mysql://localhost:3306/";
-    private static final String user = "root";
-    private static final String password = "Poophead009";
+
 
     private boolean isDataDumped = false;
 
-    static final String dbName = "CMS2059521";
-    static Connection connection;
-    static Statement statement;
+    public static final String dbName = "CMS2059521";
+    private static Connection connection;
+    private static Statement statement;
 
-    public DBUtils() {
+    public DBUtils(String user, String pass) {
         try {
-            connection = DriverManager.getConnection(url, user, password);
+            connection = DriverManager.getConnection(url, user, pass);
 
             statement = connection.createStatement();
-            System.out.println("Connection Established");
+            JOptionPane.showMessageDialog(null, "Database Connection Successful.", "Database Connected", JOptionPane.INFORMATION_MESSAGE);
             new DBCRUD();
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "SQL Server is Offline. Please turn on the server to run the program.", "Admin Register", JOptionPane.INFORMATION_MESSAGE);
-
+            JOptionPane.showMessageDialog(null, "Database Connection failed. Make sure the server is online and you have entered correct credentials.", "Database Error", JOptionPane.ERROR_MESSAGE);
         }
         this.createDatabase();
         this.dumpData();
@@ -140,7 +138,7 @@ public class DBUtils {
                       `isOptional` INT NOT NULL,
                       `moduleSem` INT NOT NULL,
                       `moduleTeacher` VARCHAR(100) NULL,
-                      `courseId` INT NOT NULL,
+                      `courseId` VARCHAR(100) NOT NULL,
                       PRIMARY KEY (`moduleCode`));""", dbName);
 
             statement.execute(sql);
@@ -274,7 +272,4 @@ public class DBUtils {
     }
 
 
-    public static void main(String[] args) {
-        new DBUtils();
-    }
 }

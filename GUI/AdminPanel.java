@@ -1,11 +1,11 @@
 package GUI;
 
 import DBHelpers.DBCRUD;
+import Modules.Course;
 import Modules.Module;
 import Users.Admin;
 import Users.Student;
 import Users.Teacher;
-import com.mysql.cj.xdevapi.Schema;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -236,24 +236,18 @@ public class AdminPanel extends JFrame implements ActionListener {
         addCourseBtn.setBounds(20,10,200,30);
         addModuleBtn.setBounds(250, 10, 200 ,30);
 
-        addCourseBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    editCourses(0, null, true);
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                }
+        addCourseBtn.addActionListener(e -> {
+            try {
+                editCourses(0, null, true);
+            } catch (SQLException ex) {
+                ex.printStackTrace();
             }
         });
-        addModuleBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    addModule();
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                }
+        addModuleBtn.addActionListener(e -> {
+            try {
+                addModule();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
             }
         });
 
@@ -271,8 +265,8 @@ public class AdminPanel extends JFrame implements ActionListener {
     private void editCourses(int courseId, String courseName, boolean isForNew) throws SQLException {
 
         System.out.println(courseName);
-        ResultSet rs = null;
-        ArrayList<String> courseModules = null;
+        ResultSet rs;
+        ArrayList<String> courseModules;
 
         ArrayList<ArrayList<String>> semModules = new ArrayList<>();
 
@@ -286,15 +280,15 @@ public class AdminPanel extends JFrame implements ActionListener {
             }else{
                 rs1 = DBCRUD.getAllModuleData(i, 0);
             }
-
+            assert rs1!=null;
             while(rs1.next()){
                 mods.add(rs1.getString("moduleCode"));
             }
             semModules.add(mods);
         }
-
         rs = DBCRUD.getCourseData(courseId);
         String courseMod = "";
+        assert rs!=null;
         if (rs.next()){
             courseMod = rs.getString("courseModules");
         }
@@ -307,7 +301,7 @@ public class AdminPanel extends JFrame implements ActionListener {
         JPanel editCoursePanel = new JPanel();
 
         editCoursePanel.setVisible(true);
-        GridLayout gl = new GridLayout(30,3);
+        GridLayout gl = new GridLayout(34,3);
         gl.setHgap(10);
         gl.setVgap(20);
         editCoursePanel.setLayout(gl);
@@ -341,7 +335,7 @@ public class AdminPanel extends JFrame implements ActionListener {
 
         }
 
-        ArrayList<JLabel> editNames = new ArrayList<>();
+
         ArrayList<JTextField> editNamesCode = new ArrayList<>();
         ArrayList<JTextField> editNamesText = new ArrayList<>();
         ArrayList<JComboBox<String>> editComboBox = new ArrayList<>();
@@ -388,11 +382,11 @@ public class AdminPanel extends JFrame implements ActionListener {
 
 
 
-        for(int i = 0; i < 24; i++){
+        for(int i = 0; i < 28; i++){
             JLabel editCourseM;
 
             if(i >= 16){
-                if(i >= 22){
+                if(i >= 24){
                     editCourseM = new JLabel("Semester 6 (Elective)");
                 }else if (i >= 20) {
                     editCourseM = new JLabel("Semester 5 (Elective)");
@@ -434,12 +428,14 @@ public class AdminPanel extends JFrame implements ActionListener {
                 ArrayList<String> allModule = new ArrayList<>();
                 ArrayList<String> allModuleCodeElective = new ArrayList<>();
                 ArrayList<String> allModuleElective = new ArrayList<>();
+                assert rs != null;
                 while (rs.next()){
                     allModuleCode.add(rs.getString("moduleCode"));
                     allModule.add(rs.getString("moduleName"));
 
                 }
                 rs = DBCRUD.getAllOptionalModule(1);
+                assert rs != null;
                 while (rs.next()){
                     allModuleCodeElective.add(rs.getString("moduleCode"));
                     allModuleElective.add(rs.getString("moduleName"));
@@ -463,7 +459,7 @@ public class AdminPanel extends JFrame implements ActionListener {
                     for(int j = 0 ; j < semModules.get(5).size(); j++){
                         moduleCodeBox.addItem(semModules.get(5).get(j));
                     }
-                }else if(i < 22){
+                }else if(i < 24){
                     for(int j = 0 ; j < semModules.get(6).size(); j++){
                         electiveModuleCodeBox.addItem(semModules.get(6).get(j));
                     }
@@ -483,33 +479,28 @@ public class AdminPanel extends JFrame implements ActionListener {
                 }else{
                     editComboBoxElective.add(electiveModuleCodeBox);
                 }
-                moduleCodeBox.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        JComboBox<String> currentBox = (JComboBox<String>)e.getSource();
-                        String currentCode = (String) currentBox.getSelectedItem();
-                        int index = editComboBox.indexOf(currentBox);
+                moduleCodeBox.addActionListener(e -> {
+                    JComboBox<String> currentBox = (JComboBox<String>)e.getSource();
+                    String currentCode = (String) currentBox.getSelectedItem();
+                    int index = editComboBox.indexOf(currentBox);
 
-                        editNamesText.get(index).setText(allModule.get(allModuleCode.indexOf(currentCode)));
+                    editNamesText.get(index).setText(allModule.get(allModuleCode.indexOf(currentCode)));
 
-                    }
                 });
-                electiveModuleCodeBox.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        JComboBox<String> currentBox = (JComboBox<String>)e.getSource();
-                        String currentCode = (String) currentBox.getSelectedItem();
-                        int index = editComboBoxElective.indexOf(currentBox) + 20;
+                electiveModuleCodeBox.addActionListener(e -> {
+                    JComboBox<String> currentBox = (JComboBox<String>)e.getSource();
+                    String currentCode = (String) currentBox.getSelectedItem();
+                    int index = editComboBoxElective.indexOf(currentBox) + 20;
 
-                        editNamesText.get(index).setText(allModuleElective.get(allModuleCodeElective.indexOf(currentCode)));
+                    editNamesText.get(index).setText(allModuleElective.get(allModuleCodeElective.indexOf(currentCode)));
 
-                    }
                 });
 
             }
 
             if(!isForNew) {
                 rs = DBCRUD.getModuleData(courseModules.get(i));
+                assert rs != null;
                 if (rs.next()) {
                     editCourseMCode.setText(rs.getString("moduleCode"));
                     editCourseMText.setText(rs.getString("moduleName"));
@@ -517,7 +508,6 @@ public class AdminPanel extends JFrame implements ActionListener {
 
                 editCoursePanel.add(editCourseM);
                 editCoursePanel.add(editCourseMCode);
-                editCoursePanel.add(editCourseMText);
 
             } else{
 
@@ -528,10 +518,9 @@ public class AdminPanel extends JFrame implements ActionListener {
                 }else{
                     editCoursePanel.add(electiveModuleCodeBox);
                 }
-                editCoursePanel.add(editCourseMText);
 
             }
-            editNames.add(editCourseM);
+            editCoursePanel.add(editCourseMText);
             editNamesCode.add(editCourseMCode);
             editNamesText.add(editCourseMText);
 
@@ -544,25 +533,40 @@ public class AdminPanel extends JFrame implements ActionListener {
         deleteBtn.setFont(normalFont);
         deleteBtn.setForeground(new Color(75, 17, 17));
 
-        deleteBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int result = JOptionPane.showConfirmDialog(null,
-                        "Are you sure you want to delete this course?",
-                        "Delete Course",
-                        JOptionPane.YES_NO_OPTION);
-                if(result == JOptionPane.YES_OPTION){
-                    DBCRUD.deleteCourseData(courseName);
-                    editCoursesFrame.dispose();
-                    ap.dispose();
-                    try {
-                        new AdminPanel(a);
-
-                    } catch (SQLException ex) {
-                        ex.printStackTrace();
+        deleteBtn.addActionListener(e -> {
+            int result = JOptionPane.showConfirmDialog(null,
+                    "Are you sure you want to delete this course?",
+                    "Delete Course",
+                    JOptionPane.YES_NO_OPTION);
+            if(result == JOptionPane.YES_OPTION){
+                ResultSet rs1 = DBCRUD.getAllModuleData();
+                assert rs1 != null;
+                ArrayList<String> allModules = new ArrayList<>();
+                try{
+                    while(rs1.next()){
+                        allModules.add(rs1.getString("moduleCode"));
                     }
-                }else if (result == JOptionPane.NO_OPTION){
-                    System.out.println("Nice");;
+                    for(String modCode: allModules){
+                        Module m = new Module(modCode);
+                        if(m.getCourseId().contains(Integer.toString(courseId))){
+                            m.setCourseId(m.getCourseId().replace(Integer.toString(courseId),""));
+                        }
+                        DBCRUD.updateModuleData(m);
+                    }
+                }catch (SQLException er){
+                    er.printStackTrace();
+                }
+
+
+
+                DBCRUD.deleteCourseData(courseName);
+                editCoursesFrame.dispose();
+                ap.dispose();
+                try {
+                    new AdminPanel(a);
+
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
                 }
             }
         });
@@ -580,79 +584,88 @@ public class AdminPanel extends JFrame implements ActionListener {
         editCoursePanel.add(editBtn);
 
 
-        editBtn.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String editedCourseName = editCoursesNameText.getText();
-                ArrayList<String> modulesToAdd = new ArrayList<>();
-                if(editedCourseName.equals("")){
-                    message.setText("Fields cannot be empty");
-                    return;
-                }
-                int isAvailable = (editCourseAvailabilityText.getSelectedItem() == "Yes") ? 1 : 0;
-                System.out.println("Isava: " + isAvailable);
-                if(!isForNew){
-                    DBCRUD.updateCourseData(courseId, editedCourseName, isAvailable);
-                }
-                for(int i = 0; i < 24; i++) {
-
-                    if(!isForNew){
-                        if(editNamesCode.get(i).getText().equals("") || editNamesText.get(i).getText().equals("")){
-                            message.setText("Fields cannot be empty");
-                            return;
-                        }
-                        try {
-                            Module m = new Module(editNamesCode.get(i).getText());
-                            m.setModuleName(editNamesText.get(i).getText());
-                            DBCRUD.updateModuleData(m);
-                        } catch (SQLException ex) {
-                            ex.printStackTrace();
-                        }
-
-
-                    }else{
-                        if(editNamesText.get(i).getText().equals("")){
-                            message.setText("Fields cannot be empty");
-                            return;
-                        }
-                        if(i < 20){
-                            if(modulesToAdd.contains((String)editComboBox.get(i).getSelectedItem())){
-
-                                message.setText("Duplicate Modules");
-                                return;
-                            }
-                            modulesToAdd.add((String)editComboBox.get(i).getSelectedItem());
-                        }else{
-                            if(modulesToAdd.contains((String)editComboBoxElective.get(i-20).getSelectedItem())){
-                                message.setText("Duplicate Modules");
-                                return;
-                            }
-                            modulesToAdd.add((String)editComboBoxElective.get(i-20).getSelectedItem());
-                        }
-
-
-                    }
-                }
-                if(isForNew){
-                    String finalModules = modulesToAdd.toString().replace("[","").replace("]","").replace(",","");
-                    System.out.println(">"+finalModules+"<");
-
-                    String[] insertData = {null, editedCourseName, "3", "6", Integer.toString(isAvailable), finalModules};
-                    DBCRUD.insertIntoCourse(insertData);
-                }
-
-                editCoursesFrame.dispose();
-                ap.dispose();
-                try {
-                    new AdminPanel(a);
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                }
-
-
-
+        editBtn.addActionListener(e -> {
+            String editedCourseName = editCoursesNameText.getText();
+            ArrayList<String> modulesToAdd = new ArrayList<>();
+            if(editedCourseName.equals("")){
+                message.setText("Fields cannot be empty");
+                return;
             }
+            int isAvailable = (editCourseAvailabilityText.getSelectedItem() == "Yes") ? 1 : 0;
+            System.out.println("Isava: " + isAvailable);
+            if(!isForNew){
+                Course c = new Course(courseId);
+                c.setCourseName(editedCourseName);
+                c.setAvailable(isAvailable);
+                DBCRUD.updateCourseData(c);
+            }
+            for(int i = 0; i < 28; i++) {
+
+                if(!isForNew){
+                    if(editNamesCode.get(i).getText().equals("") || editNamesText.get(i).getText().equals("")){
+                        message.setText("Fields cannot be empty");
+                        return;
+                    }
+                    try {
+                        Module m = new Module(editNamesCode.get(i).getText());
+                        m.setModuleName(editNamesText.get(i).getText());
+                        DBCRUD.updateModuleData(m);
+                    } catch (SQLException ex) {
+                        ex.printStackTrace();
+                    }
+
+
+                }else{
+                    if(editNamesText.get(i).getText().equals("")){
+                        message.setText("Fields cannot be empty");
+                        return;
+                    }
+                    if(i < 20){
+                        if(modulesToAdd.contains((String)editComboBox.get(i).getSelectedItem())){
+
+                            message.setText("Duplicate Modules");
+                            return;
+                        }
+                        modulesToAdd.add((String)editComboBox.get(i).getSelectedItem());
+                    }else{
+                        if(modulesToAdd.contains((String)editComboBoxElective.get(i-20).getSelectedItem())){
+                            message.setText("Duplicate Modules");
+                            return;
+                        }
+                        modulesToAdd.add((String)editComboBoxElective.get(i-20).getSelectedItem());
+                    }
+
+
+                }
+            }
+            if(isForNew){
+                String finalModules = modulesToAdd.toString().replace("[","").replace("]","").replace(",","");
+                for(String moduleToAdd: modulesToAdd){
+                    int currentId = DBCRUD.getCourseCount() + 1;
+                    try {
+                        Module m = new Module(moduleToAdd);
+                        m.setCourseId(m.getCourseId()+" " + currentId);
+                        System.out.println(m.getCourseId());
+                        DBCRUD.updateModuleData(m);
+                    } catch (SQLException ex) {
+                        ex.printStackTrace();
+                    }
+
+                }
+                String[] insertData = {null, editedCourseName, "3", "6", Integer.toString(isAvailable), finalModules};
+                DBCRUD.insertIntoCourse(insertData);
+            }
+
+            editCoursesFrame.dispose();
+            ap.dispose();
+            try {
+                new AdminPanel(a);
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+
+
+
         });
 
 
@@ -711,12 +724,7 @@ public class AdminPanel extends JFrame implements ActionListener {
         JTextField addModuleNameText = new JTextField();
         addModuleNameText.setFont(normalFont);
 
-        levelBox.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                addModuleCodeText.setText((String) levelBox.getSelectedItem());
-            }
-        });
+        levelBox.addActionListener(e -> addModuleCodeText.setText((String) levelBox.getSelectedItem()));
         JLabel level = new JLabel("Level");
         level.setFont(normalFont);
         addModulePanel.add(level);
@@ -772,71 +780,67 @@ public class AdminPanel extends JFrame implements ActionListener {
         addModulePanel.add(addBtn);
 
 
-        addBtn.addActionListener(new ActionListener() {
+        addBtn.addActionListener(e -> {
+            String level1 = (String)levelBox.getSelectedItem();
+            String moduleCode1 = addModuleCodeText.getText();
+            String moduleName1 = addModuleNameText.getText();
+            String optional1 = (String)isOptional.getSelectedItem();
 
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String level = (String)levelBox.getSelectedItem();
-                String moduleCode = addModuleCodeText.getText();
-                String moduleName = addModuleNameText.getText();
-                String optional = (String)isOptional.getSelectedItem();
+            assert level1 != null;
+            assert sem.getSelectedItem() != null;
+            assert optional1 != null;
 
-                assert level != null;
-                assert sem.getSelectedItem() != null;
-                assert optional != null;
-
-                int semester = (Integer)sem.getSelectedItem();
+            int semester1 = (Integer)sem.getSelectedItem();
 
 
-                if(level.equals("") || moduleName.equals("") || moduleCode.equals("")){
-                    message.setText("Fields cannot be empty");
-                    return;
-                }
-                if(moduleCode.charAt(0) != level.charAt(0)){
-                    message.setText("Module Code must start with level");
-                    return;
-                }
-                if(!level.equals("6") && optional.equals("Yes")){
-                    message.setText("Optional Module can only be set for level 6.");
-                    return;
-                }
-                if(!moduleName.contains("(Elective)") && optional.equals("Yes")){
-                    moduleName = moduleName + " (Elective)";
-                }
-
-                try{
-                    ResultSet rs = DBCRUD.getAllModuleData();
-                    ArrayList<String> allModules = new ArrayList<>();
-                    ArrayList<String> allCodes = new ArrayList<>();
-                    while(rs.next()){
-                        allModules.add(rs.getString("moduleName"));
-                        allCodes.add(rs.getString("moduleCode"));
-                    }
-                    if(allCodes.contains(moduleCode)){
-                        message.setText("Module Code already in use");
-                        return;
-                    }
-                    if(allModules.contains(moduleName)){
-                        message.setText("Module Name already in use");
-                        return;
-                    }
-                }catch (SQLException er){
-                    er.printStackTrace();
-                }
-                int finalSem = (level.equals("6")) ? 4 + semester : (level.equals("5") ? 2 + semester : semester);
-                String[] moduleData = {moduleCode, moduleName, level, "20", (optional.equals("Yes")) ? "1" : "0", Integer.toString(finalSem), "null", "0"};
-                System.out.println(Arrays.toString(moduleData));
-                DBCRUD.insertIntoModule(moduleData);
-
-                addModuleFrame.dispose();
-                ap.dispose();
-                try {
-                    new AdminPanel(a);
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                }
-
+            if(level1.equals("") || moduleName1.equals("") || moduleCode1.equals("")){
+                message.setText("Fields cannot be empty");
+                return;
             }
+            if(moduleCode1.charAt(0) != level1.charAt(0)){
+                message.setText("Module Code must start with level");
+                return;
+            }
+            if(!level1.equals("6") && optional1.equals("Yes")){
+                message.setText("Optional Module can only be set for level 6.");
+                return;
+            }
+            if(!moduleName1.contains("(Elective)") && optional1.equals("Yes")){
+                moduleName1 = moduleName1 + " (Elective)";
+            }
+
+            try{
+                ResultSet rs = DBCRUD.getAllModuleData();
+                ArrayList<String> allModules = new ArrayList<>();
+                ArrayList<String> allCodes = new ArrayList<>();
+                while(rs.next()){
+                    allModules.add(rs.getString("moduleName"));
+                    allCodes.add(rs.getString("moduleCode"));
+                }
+                if(allCodes.contains(moduleCode1)){
+                    message.setText("Module Code already in use");
+                    return;
+                }
+                if(allModules.contains(moduleName1)){
+                    message.setText("Module Name already in use");
+                    return;
+                }
+            }catch (SQLException er){
+                er.printStackTrace();
+            }
+            int finalSem = (level1.equals("6")) ? 4 + semester1 : (level1.equals("5") ? 2 + semester1 : semester1);
+            String[] moduleData = {moduleCode1, moduleName1, level1, "20", (optional1.equals("Yes")) ? "1" : "0", Integer.toString(finalSem), "null", "0"};
+            System.out.println(Arrays.toString(moduleData));
+            DBCRUD.insertIntoModule(moduleData);
+            JOptionPane.showMessageDialog(null, "Module " + moduleCode1 +": " + moduleName1 +" added successfully", "Module Added", JOptionPane.INFORMATION_MESSAGE);
+            addModuleFrame.dispose();
+            ap.dispose();
+            try {
+                new AdminPanel(a);
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+
         });
 
 
@@ -922,13 +926,10 @@ public class AdminPanel extends JFrame implements ActionListener {
         addTeacherBtn.setFont(normalFont);
         addTeacherBtn.setBounds(20,10,200,30);
 
-        addTeacherBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                new RegisterForm("TEACHER", a);
-                ap.dispose();
+        addTeacherBtn.addActionListener(e -> {
+            new RegisterForm("TEACHER", a);
+            ap.dispose();
 
-            }
         });
 
         teacherEditPanel.add(addTeacherBtn);
@@ -1099,6 +1100,7 @@ public class AdminPanel extends JFrame implements ActionListener {
 
             ArrayList<String> allModuleTeacher = new ArrayList<>();
             rs = DBCRUD.getAllNonEmptyModuleData();
+            assert rs != null;
             while(rs.next()){
                 allModuleTeacher.add(rs.getString("moduleCode"));
             }
@@ -1117,45 +1119,41 @@ public class AdminPanel extends JFrame implements ActionListener {
 
 
             editTeacherPanel.add(editBtn);
-            editBtn.addActionListener(new ActionListener() {
+            editBtn.addActionListener(e -> {
+                String modu1 = (String)mod1.getSelectedItem();
+                String modu2 = (String)mod2.getSelectedItem();
+                String modu3 = (String)mod3.getSelectedItem();
+                String modu4 = (String)mod4.getSelectedItem();
+                if(allModuleTeacher.contains(modu1)){
+                    message.setText(modu1 +" is assigned to another teacher!");
+                    return;
+                }else if (allModuleTeacher.contains(modu2)){
+                    message.setText(modu2 +" is assigned to another teacher!");
+                    return;
+                }else if (allModuleTeacher.contains(modu3)){
+                    message.setText(modu3 +" is assigned to another teacher!");
+                    return;
+                }else if (allModuleTeacher.contains(modu4)){
+                    message.setText(modu4 +" is assigned to another teacher!");
+                    return;
+                }
+                String modules = modu1 + " " + modu2 + " " + modu3 + " " + modu4;
+                Teacher t = new Teacher(editTeacherUserNameText.getText());
+                t.setFirstName(editTeacherFirstNameText.getText());
+                t.setLastName(editTeacherLastNameText.getText());
+                t.setAddress(editTeacherAddressText.getText());
+                t.setContact(editTeacherContactText.getText());
+                t.setTeacherModules(modules);
+                DBCRUD.updateTeacherData(t);
 
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    String modu1 = (String)mod1.getSelectedItem();
-                    String modu2 = (String)mod2.getSelectedItem();
-                    String modu3 = (String)mod3.getSelectedItem();
-                    String modu4 = (String)mod4.getSelectedItem();
-                    if(allModuleTeacher.contains(modu1)){
-                        message.setText(modu1 +" is assigned to another teacher!");
-                        return;
-                    }else if (allModuleTeacher.contains(modu2)){
-                        message.setText(modu2 +" is assigned to another teacher!");
-                        return;
-                    }else if (allModuleTeacher.contains(modu3)){
-                        message.setText(modu3 +" is assigned to another teacher!");
-                        return;
-                    }else if (allModuleTeacher.contains(modu4)){
-                        message.setText(modu4 +" is assigned to another teacher!");
-                        return;
-                    }
-                    String modules = modu1 + " " + modu2 + " " + modu3 + " " + modu4;
-                    Teacher t = new Teacher(editTeacherUserNameText.getText());
-                    t.setFirstName(editTeacherFirstNameText.getText());
-                    t.setLastName(editTeacherLastNameText.getText());
-                    t.setAddress(editTeacherAddressText.getText());
-                    t.setContact(editTeacherContactText.getText());
-                    t.setTeacherModules(modules);
-                    DBCRUD.updateTeacherData(t);
+                editTeacherFrame.dispose();
+                ap.dispose();
+                try {
+                    AdminPanel adminPanel = new AdminPanel(a);
+                    adminPanel.showTeachersPanel();
 
-                    editTeacherFrame.dispose();
-                    ap.dispose();
-                    try {
-                        AdminPanel adminPanel = new AdminPanel(a);
-                        adminPanel.showTeachersPanel();
-
-                    } catch (SQLException ex) {
-                        ex.printStackTrace();
-                    }
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
                 }
             });
 
@@ -1204,6 +1202,7 @@ public class AdminPanel extends JFrame implements ActionListener {
         for(int i = 0; i < studentCourses.size(); i++){
 
             rs =DBCRUD.getCourseData(studentCourses.get(i));
+            assert rs != null;
             if(rs.next()){
                 Vector<String> v = data.get(i);
                 v.addElement(rs.getString("courseName"));
@@ -1279,43 +1278,19 @@ public class AdminPanel extends JFrame implements ActionListener {
             semLabel.setBorder(new EmptyBorder(10,10,10,10));
 //            semLabel.add(Box.createRigidArea(new Dimension(10,50)));
             Vector<Vector<String>> data = new Vector<>();
-            if(i < 4){
-                for(int j = 0; j < 4; j++){
-                    Vector<String> row = new Vector<>(columnNames.size());
-                    ResultSet rs = DBCRUD.getModuleData(studentModules.get((i*4)+j));
-                    if(rs.next()){
-                        row.addElement(rs.getString("moduleCode"));
-                        row.addElement(rs.getString("moduleName"));
-                        row.addElement(studentMarks.get((i*4)+j));
-                        currentMarks.add(studentMarks.get((i*4)+j));
-                    }
-                    data.addElement(row);
+            for(int j = 0; j < 4; j++){
+                Vector<String> row = new Vector<>(columnNames.size());
+                ResultSet rs = DBCRUD.getModuleData(studentModules.get((i*4)+j));
+                assert rs != null;
+                if(rs.next()){
+                    row.addElement(rs.getString("moduleCode"));
+                    row.addElement(rs.getString("moduleName"));
+                    row.addElement(studentMarks.get((i*4)+j));
+                    currentMarks.add(studentMarks.get((i*4)+j));
                 }
-            }else if (i==4){
-                for(int j = 0; j < 3; j++){
-                    Vector<String> row = new Vector<>(columnNames.size());
-                    ResultSet rs = DBCRUD.getModuleData(studentModules.get(16+j));
-                    if(rs.next()){
-                        row.addElement(rs.getString("moduleCode"));
-                        row.addElement(rs.getString("moduleName"));
-                        row.addElement(studentMarks.get((i*4)+j));
-                        currentMarks.add(studentMarks.get((i*4)+j));
-                    }
-                    data.addElement(row);
-                }
-            }else{
-                for(int j = 0; j < 3; j++){
-                    Vector<String> row = new Vector<>(columnNames.size());
-                    ResultSet rs = DBCRUD.getModuleData(studentModules.get(19+j));
-                    if(rs.next()){
-                        row.addElement(rs.getString("moduleCode"));
-                        row.addElement(rs.getString("moduleName"));
-                        row.addElement(studentMarks.get((i*4)+j));
-                        currentMarks.add(studentMarks.get((i*4)+j));
-                    }
-                    data.addElement(row);
-                }
+                data.addElement(row);
             }
+
 
 
 
@@ -1356,12 +1331,9 @@ public class AdminPanel extends JFrame implements ActionListener {
                     avg+=Integer.parseInt(marks);
                 }
             }
-            if(i<4){
-                avg = avg/4;
 
-            }else{
-                avg = avg/3;
-            }
+            avg = avg/4;
+
             JLabel percentageLabel = new JLabel("Percentage");
             percentageLabel.setFont(titleFont2);
 
@@ -1398,61 +1370,45 @@ public class AdminPanel extends JFrame implements ActionListener {
         JButton generateBtn = new JButton("Promote Student");
         generateBtn.setFont(normalFont);
 
-        generateBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int size = st.getEnrolledModules().split(" ").length-1;
-                int passedSem = 0;
-                ArrayList<String> remarks = new ArrayList<>(Arrays.asList(st.getRemarks().split(" ")));
-                if(st.getPassedSem()<4){
-                    for(int i = 0; i <4 ; i++){
-                        if(studentMarks.get(size-i).equals("TBD")){
-                            JOptionPane.showMessageDialog(null, "Mark is yet to be assigned by a teacher", "Error", JOptionPane.ERROR_MESSAGE);
-                            return;
-                        }
-                        if(Integer.parseInt(studentMarks.get(size-i))>40){
-                            passedSem += 1;
-                        }
-                    }
-
-                }else{
-                    for(int i = 0; i <3 ; i++){
-                        if(studentMarks.get(size-i).equals("TBD")){
-                            JOptionPane.showMessageDialog(null, "Mark is yet to be assigned by a teacher", "Error", JOptionPane.ERROR_MESSAGE);
-                            return;
-                        }
-                        if(Integer.parseInt(studentMarks.get(size-i))>40){
-                            passedSem += 1;
-                        }
-                    }
+        generateBtn.addActionListener(e -> {
+            int size = st.getEnrolledModules().split(" ").length-1;
+            int passedSem = 0;
+            ArrayList<String> remarks = new ArrayList<>(Arrays.asList(st.getRemarks().split(" ")));
+            for(int i = 0; i <4 ; i++){
+                if(studentMarks.get(size-i).equals("TBD")){
+                    JOptionPane.showMessageDialog(null, "Mark is yet to be assigned by a teacher", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
                 }
-                if(passedSem< 2){
-                    JOptionPane.showMessageDialog(null, "The student has failed in more than half subjects and cannot be promoted!", "Error", JOptionPane.ERROR_MESSAGE);
-                    System.out.println(remarks);
-                    remarks.set(st.getPassedSem(), "Fail");
-
-                }else{
-                    remarks.set(st.getPassedSem(), "Pass");
-                    try {
-                        st.promoteSem();
-                    } catch (SQLException ex) {
-                        ex.printStackTrace();
-                    }
+                if(Integer.parseInt(studentMarks.get(size-i))>40){
+                    passedSem += 1;
                 }
+            }
+            if(passedSem< 2){
+                JOptionPane.showMessageDialog(null, "The student has failed in more than half subjects and cannot be promoted!", "Error", JOptionPane.ERROR_MESSAGE);
+                System.out.println(remarks);
+                remarks.set(st.getPassedSem(), "Fail");
 
-                st.setRemarks(remarks.toString().replace("[","").replace("]","").replace(",",""));
-                System.out.println(st.getEnrolledModules());
-                System.out.println(st.getPassedSem());
-                System.out.println(st.getRemarks());
-                DBCRUD.updateStudentData(st);
-
-                ap.dispose();
+            }else{
+                remarks.set(st.getPassedSem(), "Pass");
                 try {
-                    AdminPanel app = new AdminPanel(a);
-                    app.showStudentsPanel();
+                    st.promoteSem();
                 } catch (SQLException ex) {
                     ex.printStackTrace();
                 }
+            }
+
+            st.setRemarks(remarks.toString().replace("[","").replace("]","").replace(",",""));
+            System.out.println(st.getEnrolledModules());
+            System.out.println(st.getPassedSem());
+            System.out.println(st.getRemarks());
+            DBCRUD.updateStudentData(st);
+            JOptionPane.showMessageDialog(null, "Student promoted to next semester.", "Promoted", JOptionPane.INFORMATION_MESSAGE);
+            ap.dispose();
+            try {
+                AdminPanel app = new AdminPanel(a);
+                app.showStudentsPanel();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
             }
         });
 

@@ -55,9 +55,7 @@ public class Teacher extends User{
                 setContact(rs.getString("contact"));
                 setTeacherModules(rs.getString("teacherModules"));
 
-                if(getUsername().equals(username) && getPassword().equals(password)){
-                    return true;
-                }
+                return getUsername().equals(username) && getPassword().equals(password);
             }
             return false;
 

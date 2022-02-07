@@ -16,11 +16,11 @@ import java.util.ArrayList;
 
 public class CourseInfo extends JFrame implements ActionListener {
 
-    JPanel panel, infoPanel;
-    JLabel title_label, semester;
-    JButton back, enroll;
-    Student st;
-    int courseId;
+    private JLabel titleLabel;
+    private final JButton back;
+    private final JButton enroll;
+    private final Student st;
+    private final int courseId;
     public CourseInfo(Student st, int courseId) throws SQLException {
 
         Font titleFont = new Font("Bahnschrift", Font.BOLD, 20);
@@ -32,12 +32,13 @@ public class CourseInfo extends JFrame implements ActionListener {
 
         // Title Label
         ResultSet rs = DBCRUD.getCourseData(courseId);
+        assert rs != null;
         if (rs.next()){
-            title_label = new JLabel(rs.getString("courseName"));
+            titleLabel = new JLabel(rs.getString("courseName"));
 
         }
 
-        title_label.setFont(titleFont);
+        titleLabel.setFont(titleFont);
 
 
         // Back
@@ -49,29 +50,28 @@ public class CourseInfo extends JFrame implements ActionListener {
         enroll = new JButton("ENROLL");
         enroll.setFont(normalFont);
 
-        title_label.setBounds(50, 20, 300, 20);
+        titleLabel.setBounds(50, 20, 300, 20);
         back.setBounds(80, 380, 140, 30);
         enroll.setBounds(250, 380, 140 ,30);
 
 
-
-        panel = new JPanel(null);
+        JPanel panel = new JPanel(null);
         panel.setBorder(new EmptyBorder(10,10,10,10));
 
-        infoPanel = new JPanel();
+        JPanel infoPanel = new JPanel();
         infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
         infoPanel.add(Box.createRigidArea(new Dimension(10,10)));
 
         rs = DBCRUD.getCourseData(courseId);
         String[] modules = {};
-
+        assert rs != null;
         if(rs.next()){
             modules = rs.getString("courseModules").split(" ");
         }
         String module;
         int index = 0;
         for(int sem = 1; sem <= 6; sem++) {
-            semester = new JLabel("Semester " + sem);
+            JLabel semester = new JLabel("Semester " + sem);
             semester.setFont(titleFont2);
 
             infoPanel.add(semester);
@@ -80,7 +80,7 @@ public class CourseInfo extends JFrame implements ActionListener {
                     module = modules[i];
                     System.out.println(module);
                     rs  = DBCRUD.getModuleData(module);
-
+                    assert rs != null;
                     if(rs.next()){
                         JLabel mod = new JLabel(rs.getString("moduleName"));
                         mod.setFont(normalFont);
@@ -93,7 +93,7 @@ public class CourseInfo extends JFrame implements ActionListener {
                 for(int i = index; i < index +2 ; i ++){
                     module = modules[i];
                     rs  = DBCRUD.getModuleData(module);
-
+                    assert rs != null;
                     if(rs.next()){
                         JLabel mod = new JLabel(rs.getString("moduleName"));
                         mod.setFont(normalFont);
@@ -101,9 +101,12 @@ public class CourseInfo extends JFrame implements ActionListener {
 
                     }
                 }
-                JLabel elective = new JLabel("(Elective)");
-                elective.setFont(normalFont);
-                infoPanel.add(elective);
+                JLabel elective1 = new JLabel("(Elective1)");
+                JLabel elective2 = new JLabel("(Elective2)");
+                elective1.setFont(normalFont);
+                elective2.setFont(normalFont);
+                infoPanel.add(elective1);
+                infoPanel.add(elective2);
                 index+=2;
             }
 
@@ -113,9 +116,10 @@ public class CourseInfo extends JFrame implements ActionListener {
         JLabel electivesLabel = new JLabel("Electives");
         electivesLabel.setFont(titleFont2);
         infoPanel.add(electivesLabel);
-        for(int i = index; i < index+4; i++){
+        for(int i = index; i < index+8; i++){
             module = modules[i];
             rs  = DBCRUD.getModuleData(module);
+            assert rs != null;
             if(rs.next()){
                 JLabel electMod = new JLabel(rs.getString("moduleName").replace("(Elective)",""));
                 electMod.setFont(normalFont);
@@ -133,7 +137,7 @@ public class CourseInfo extends JFrame implements ActionListener {
 
 
         panel.add(pane);
-        panel.add(title_label);
+        panel.add(titleLabel);
         panel.add(back);
         panel.add(enroll);
 
@@ -165,9 +169,10 @@ public class CourseInfo extends JFrame implements ActionListener {
         }else if (e.getSource() == enroll){
             st.setEnrolledCourse(courseId);
             ResultSet rs = DBCRUD.getModules(Integer.toString(st.getEnrolledCourse()), 1);
+            System.out.println("ENROLLED->" + st.getEnrolledCourse());
             ArrayList<String> modules = new ArrayList<>();
             try {
-
+                assert rs != null;
                 while(rs.next()){
                     modules.add(rs.getString("moduleCode"));
                 }
@@ -175,6 +180,7 @@ public class CourseInfo extends JFrame implements ActionListener {
             } catch (SQLException ex) {
                 ex.printStackTrace();
             }
+            System.out.println(modules);
             st.setEnrolledModules(modules.toString().replace("[", "").replace("]", "").replace(",", ""));
             if(st.register()){
                 System.out.println("Student Registered");
@@ -182,7 +188,7 @@ public class CourseInfo extends JFrame implements ActionListener {
                 this.dispose();
                 new Login();
 
-            };
+            }
         }
 
 

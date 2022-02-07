@@ -2,6 +2,7 @@ package GUI;
 
 import DBHelpers.DBCRUD;
 import Users.Student;
+import com.mysql.cj.log.Log;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -17,14 +18,14 @@ import java.util.Vector;
 
 public class StudentPanel extends JFrame implements ActionListener {
 
-    private final JPanel bottomPanel;
+    private JPanel bottomPanel = null;
     private JPanel infoPanel;
     private JPanel chooseElectivePanel;
     private JScrollPane modulesPane;
-    private final JButton logOutBtn;
-    private final JButton modulesBtn;
-    private final JButton resultBtn;
-    private final JButton infoBtn;
+    private JButton logOutBtn = null;
+    private JButton modulesBtn = null;
+    private JButton resultBtn = null;
+    private JButton infoBtn = null;
     private String[] modules = {};
     private ArrayList<String> studentModules = null;
     private final ArrayList<String> teacherUsername = new ArrayList<>();
@@ -36,11 +37,17 @@ public class StudentPanel extends JFrame implements ActionListener {
     private final Font titleFont2 = new Font("Bahnschrift", Font.BOLD, 14);
     private final Font normalFont = new Font("Bahnschrift", Font.PLAIN, 13);
 
-    private final StudentPanel s;
+    private StudentPanel s = null;
 
 
     public StudentPanel(Student st) throws SQLException {
         this.st = st;
+
+        if(!DBCRUD.isCourseAvailable(st.getEnrolledCourse())){
+            JOptionPane.showMessageDialog(null, "The Course has been deleted by the admin.", "Fatal Error", JOptionPane.ERROR_MESSAGE);
+            new Login();
+            return;
+        }
 
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setSize(WIDTH+10,HEIGHT+35);
@@ -145,10 +152,7 @@ public class StudentPanel extends JFrame implements ActionListener {
         if(rs.next()){
             modules = rs.getString("enrolledModules").split(" ");
         }
-//        rs = DBCRUD.getCourseData(st.getEnrolledCourse());
-//        if(rs.next()){
-//            studentModules = new ArrayList<>(Arrays.asList(rs.getString("courseModules").split(" ")));
-//        }
+
         studentModules = new ArrayList<>(Arrays.asList(modules));
         studentMarks = new ArrayList<>(Arrays.asList(st.getMarks().split(" ")));
 
@@ -161,18 +165,15 @@ public class StudentPanel extends JFrame implements ActionListener {
 
 
         Vector<Vector<String>> data = new Vector<>();
-//        for(int i = 4*(st.getPassedSem()); i < Math.min(modules.length, 4*(st.getPassedSem()+1)); i++){
-        int start = 0;
+        int start;
         int end = modules.length;
-        if(st.getPassedSem() < 5){
-            start = 4*(st.getPassedSem());
-        }else if(st.getPassedSem() == 5){
-            start = 4*(st.getPassedSem()) - 1 ;
-        }
+        start = 4*(st.getPassedSem());
+
+        System.out.println(start + "-" + end);
         for(int i = start; i < end; i++){
 
             Vector<String> row = new Vector<>(columnNames.size());
-            if(modules[i].equals("(Elective)")){
+            if(modules[i].equals("(Elective1)") || modules[i].equals("(Elective2)")){
                 row.addElement("Elective");
                 row.addElement("Elective");
                 row.addElement("Elective");
@@ -180,26 +181,20 @@ public class StudentPanel extends JFrame implements ActionListener {
                 teacherUsername.add("Elective");
             }else{
                 rs = DBCRUD.getModuleData(modules[i]);
+                assert rs != null;
                 if(rs.next() && rs.getInt("moduleSem") <= st.getPassedSem()+1){
                     row.addElement(rs.getString("moduleCode"));
                     row.addElement(rs.getString("moduleName"));
                     row.addElement(rs.getString("moduleLevel"));
                     row.addElement(rs.getString("moduleCredit"));
                     teacherUsername.add(rs.getString("moduleTeacher"));
+                    System.out.println(rs.getString("moduleTeacher"));
+
                 }
             }
 
             data.addElement(row);
         }
-
-
-
-        rs = DBCRUD.getCourseData(st.getEnrolledCourse());
-//        String[] modules = {};
-//
-//        if(rs.next()){
-//            modules = rs.getString("courseModules").split(" ");
-//        }
 
         for(int i = 0; i < end-start; i++){
             Vector<String> v = data.get(i);
@@ -214,18 +209,7 @@ public class StudentPanel extends JFrame implements ActionListener {
         }
 
 
-        JTable table = new JTable(data, columnNames){
-            public Class getColumnClass(int column){
-                for(int row =0; row<getRowCount(); row++){
-                    Object o = getValueAt(row, column);
-                    if(o!= null){
-                        return o.getClass();
-                    }
-                }
-                return Object.class;
-            }
-
-        };
+        JTable table = new JTable(data, columnNames);
 
         table.getTableHeader().setFont(titleFont2);
         table.setFont(normalFont);
@@ -266,92 +250,99 @@ public class StudentPanel extends JFrame implements ActionListener {
 //        if(st.getPassedSem()<4){
 //            chooseElectiveBtn.setEnabled(false);
 //        }else
-        if(!st.getEnrolledModules().contains("(Elective)")){
+        if(!st.getEnrolledModules().contains("(Elective1)") && !st.getEnrolledModules().contains("(Elective2)")){
             chooseElectiveBtn.setEnabled(false);
         }
         chooseElectivePanel.add(chooseElectiveBtn);
 
-        chooseElectiveBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                ArrayList<String> courseModules = null;
-                ArrayList<String> electiveMods = new ArrayList<>();
+        chooseElectiveBtn.addActionListener(e -> {
+            ArrayList<String> courseModules = null;
+            ArrayList<String> electiveMods = new ArrayList<>();
 
-                JFrame electiveFrame = new JFrame();
-                electiveFrame.setVisible(true);
-                electiveFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                electiveFrame.setSize(600,200);
-                electiveFrame.setLocationRelativeTo(null);
-                electiveFrame.setTitle("Choose Elective Module");
+            JFrame electiveFrame = new JFrame();
+            electiveFrame.setVisible(true);
+            electiveFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            electiveFrame.setSize(600,200);
+            electiveFrame.setLocationRelativeTo(null);
+            electiveFrame.setTitle("Choose Elective Module");
 
 
-                GridLayout gl = new GridLayout(2,2);
-                gl.setVgap(40);
-                JPanel electivePanel = new JPanel(gl);
-                electivePanel.setVisible(true);
-                electivePanel.setBorder(new EmptyBorder(20,20,20,20));
+            GridLayout gl = new GridLayout(3,2);
+            gl.setVgap(10);
+            JPanel electivePanel = new JPanel(gl);
+            electivePanel.setVisible(true);
+            electivePanel.setBorder(new EmptyBorder(20,20,20,20));
 
-                JLabel electiveLabel = new JLabel("Level " + (st.getPassedSem() + 1) + " Elective:");
-                electiveLabel.setFont(normalFont);
+            JLabel electiveLabel = new JLabel("Level " + (st.getPassedSem() + 1) + " Elective:");
+            electiveLabel.setFont(normalFont);
 
-                JComboBox<String> electiveBox = new JComboBox<>();
-
-
-                ResultSet rs = DBCRUD.getCourseData(st.getEnrolledCourse());
-                try {
-                    if (rs.next()) {
-                        courseModules = new ArrayList<>(Arrays.asList(rs.getString("courseModules").split(" ")));
-                    }
+            JComboBox<String> electiveBox1 = new JComboBox<>();
+            JComboBox<String> electiveBox2 = new JComboBox<>();
 
 
-                    for (String courseMod : courseModules) {
-                        rs = DBCRUD.getModuleData(courseMod);
-                        if (rs.next()) {
-                            if (rs.getInt("moduleSem") == st.getPassedSem() + 1 && rs.getInt("isOptional") == 1) {
-                                electiveMods.add(courseMod);
-                                electiveBox.addItem(rs.getString("moduleName").replace("(Elective)",""));
-                            }
-                        }
-                    }
-
-
-                }catch (SQLException er){
-                    er.printStackTrace();
+            ResultSet rs1 = DBCRUD.getCourseData(st.getEnrolledCourse());
+            try {
+                assert rs1 != null;
+                if (rs1.next()) {
+                    courseModules = new ArrayList<>(Arrays.asList(rs1.getString("courseModules").split(" ")));
                 }
 
 
-
-
-                JButton addElectiveBtn = new JButton("Confirm");
-                addElectiveBtn.setFont(normalFont);
-
-                addElectiveBtn.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        String chosenMod = electiveMods.get(electiveBox.getSelectedIndex());
-                        st.setEnrolledModules(studentModules.toString().replace("(Elective)", chosenMod).replace("[","").replace(",","").replace("]",""));
-                        DBCRUD.updateStudentData(st);
-                        s.dispose();
-                        try {
-                            new StudentPanel(st);
-                        } catch (SQLException ex) {
-                            ex.printStackTrace();
+                assert courseModules != null;
+                for (String courseMod : courseModules) {
+                    rs1 = DBCRUD.getModuleData(courseMod);
+                    assert rs1 != null;
+                    if (rs1.next()) {
+                        if (rs1.getInt("moduleSem") == st.getPassedSem() + 1 && rs1.getInt("isOptional") == 1) {
+                            electiveMods.add(courseMod);
+                            electiveBox1.addItem(rs1.getString("moduleName").replace("(Elective)",""));
+                            electiveBox2.addItem(rs1.getString("moduleName").replace("(Elective)",""));
                         }
-
                     }
-                });
+                }
 
-                electivePanel.add(electiveLabel);
-                electivePanel.add(electiveBox);
-                electivePanel.add(new JLabel(""));
-                electivePanel.add(addElectiveBtn);
 
-                electiveFrame.add(electivePanel);
+            }catch (SQLException er){
+                er.printStackTrace();
             }
+
+
+            electiveBox1.setSelectedItem(0);
+            electiveBox2.setSelectedItem(1);
+
+            JButton addElectiveBtn = new JButton("Confirm");
+            addElectiveBtn.setFont(normalFont);
+
+            addElectiveBtn.addActionListener(e1 -> {
+                String chosenMod1 = electiveMods.get(electiveBox1.getSelectedIndex());
+                String chosenMod2 = electiveMods.get(electiveBox2.getSelectedIndex());
+                if(chosenMod1.equals(chosenMod2)){
+                    JOptionPane.showMessageDialog(null, "Please choose different modules", "Incorrect Assignment", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                st.setEnrolledModules(studentModules.toString().replace("(Elective1)", chosenMod1).replace("(Elective2)", chosenMod2).replace("[","").replace(",","").replace("]",""));
+                DBCRUD.updateStudentData(st);
+                electiveFrame.dispose();
+                s.dispose();
+                try {
+                    new StudentPanel(st);
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+
+            });
+
+            electivePanel.add(electiveLabel);
+            electivePanel.add(new JLabel(""));
+            electivePanel.add(electiveBox1);
+            electivePanel.add(electiveBox2);
+            electivePanel.add(new JLabel(""));
+            electivePanel.add(addElectiveBtn);
+
+            electiveFrame.add(electivePanel);
         });
 
-//        chooseElectivePanel.add(addTeacherBtn);
-//        teacherEditPanel.setBackground(Color.red);
+
         chooseElectivePanel.setBounds(200, HEIGHT-ROW_HEIGHT-50, WIDTH-200, 50);
 
         bottomPanel.add(chooseElectivePanel);
@@ -371,56 +362,27 @@ public class StudentPanel extends JFrame implements ActionListener {
         columnNames.add("Marks");
 
 
-
-
+        System.out.println(studentModules.toString());
         JPanel semResultPanel = new JPanel();
         semResultPanel.setLayout(new BoxLayout(semResultPanel, BoxLayout.Y_AXIS));
-//        semResultPanel.setSize(new Dimension(400,200));
         for(int i = 0; i < st.getPassedSem()+1; i++){
             ArrayList<String> currentMarks = new ArrayList<>();
             JLabel semLabel = new JLabel("Semester " + (i+1));
             semLabel.setFont(new Font("Consolas", Font.BOLD, 20));
             semLabel.setBorder(new EmptyBorder(10,10,10,10));
-//            semLabel.add(Box.createRigidArea(new Dimension(10,50)));
             Vector<Vector<String>> data = new Vector<>();
-            if(i < 4){
-                for(int j = 0; j < 4; j++){
-                    Vector<String> row = new Vector<>(columnNames.size());
-                    ResultSet rs = DBCRUD.getModuleData(studentModules.get((i*4)+j));
-                    if(rs.next()){
-                        row.addElement(rs.getString("moduleCode"));
-                        row.addElement(rs.getString("moduleName"));
-                        row.addElement(studentMarks.get((i*4)+j));
-                        currentMarks.add(studentMarks.get((i*4)+j));
-                    }
-                    data.addElement(row);
+            for(int j = 0; j < 4; j++){
+                Vector<String> row = new Vector<>(columnNames.size());
+                ResultSet rs = DBCRUD.getModuleData(studentModules.get((i*4)+j));
+                assert rs != null;
+                if(rs.next()){
+                    row.addElement(rs.getString("moduleCode"));
+                    row.addElement(rs.getString("moduleName"));
+                    row.addElement(studentMarks.get((i*4)+j));
+                    currentMarks.add(studentMarks.get((i*4)+j));
                 }
-            }else if (i==4){
-                for(int j = 0; j < 3; j++){
-                    Vector<String> row = new Vector<>(columnNames.size());
-                    ResultSet rs = DBCRUD.getModuleData(studentModules.get(16+j));
-                    if(rs.next()){
-                        row.addElement(rs.getString("moduleCode"));
-                        row.addElement(rs.getString("moduleName"));
-                        row.addElement(studentMarks.get((i*4)+j));
-                        currentMarks.add(studentMarks.get((i*4)+j));
-                    }
-                    data.addElement(row);
-                }
-            }else{
-                for(int j = 0; j < 3; j++){
-                    Vector<String> row = new Vector<>(columnNames.size());
-                    ResultSet rs = DBCRUD.getModuleData(studentModules.get(19+j));
-                    if(rs.next()){
-                        row.addElement(rs.getString("moduleCode"));
-                        row.addElement(rs.getString("moduleName"));
-                        row.addElement(studentMarks.get((i*4)+j));
-                        currentMarks.add(studentMarks.get((i*4)+j));
-                    }
-                    data.addElement(row);
-                }
+                data.addElement(row);
             }
-
 
 
             JTable table = new JTable(data, columnNames);
@@ -460,12 +422,10 @@ public class StudentPanel extends JFrame implements ActionListener {
                     avg+=Integer.parseInt(marks);
                 }
             }
-            if(i<4){
-                avg = avg/4;
 
-            }else{
-               avg = avg/3;
-            }
+            avg = avg/4;
+
+
             JLabel percentageLabel = new JLabel("Percentage");
             percentageLabel.setFont(titleFont2);
 
@@ -562,29 +522,35 @@ public class StudentPanel extends JFrame implements ActionListener {
             int courseId = rs.getInt("enrolledCourse");
             ResultSet rs2 = DBCRUD.getCourseData(courseId);
             JTextField textEnrolledCourse = null;
+            assert rs2 != null;
             if(rs2.next()){
                 textEnrolledCourse = new JTextField(rs2.getString("courseName"));
             }
 
+            assert textEnrolledCourse != null;
             textEnrolledCourse.setEnabled(false);
 
             JButton stdEdit = new JButton("Edit");
             stdEdit.setFont(normalFont);
 
-            stdEdit.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    st.setFirstName(textFirstName.getText());
-                    st.setLastName(textLastName.getText());
-                    st.setAddress(textAddress.getText());
-                    st.setContact(textContact.getText());
-                    st.setPassword(textPassword.getText());
+            stdEdit.addActionListener(e -> {
+                st.setFirstName(textFirstName.getText());
+                st.setLastName(textLastName.getText());
+                st.setAddress(textAddress.getText());
+                st.setContact(textContact.getText());
+                st.setPassword(textPassword.getText());
 
-                    if(DBCRUD.updateStudentData(st)){
-                        JOptionPane.showMessageDialog(null, "Information Updated Successfully!", "Updated", JOptionPane.INFORMATION_MESSAGE);
-                    }else{
-                        JOptionPane.showMessageDialog(null, "Information could not be updated!", "Error", JOptionPane.ERROR_MESSAGE);
-                    }
+                if(DBCRUD.updateStudentData(st)){
+                    JOptionPane.showMessageDialog(null, "Information Updated Successfully!", "Updated", JOptionPane.INFORMATION_MESSAGE);
+                }else{
+                    JOptionPane.showMessageDialog(null, "Information could not be updated!", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+
+                s.dispose();
+                try {
+                    new StudentPanel(st);
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
                 }
             });
 

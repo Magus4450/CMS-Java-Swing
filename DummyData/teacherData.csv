@@ -1,7 +1,7 @@
-1,teacher1,teacher1,Rukesh,Shrestha,address1,9999,4CI018 6CS005
-2,teacher2,teacher2,Ozone,Bhattarai,address2,1111,4MM013 6CS005 6CS014
-3,teacher3,teacher3,Sugam,Karki,address3,1111,4CS016 6MM026
-4,teacher4,teacher4,Apple,Thapa,address4,1111,4CS015 6MM029
+1,teacher1,teacher1,Rukesh,Shrestha,address1,9999,4CI018 6CS005 4CI001
+2,teacher2,teacher2,Ozone,Bhattarai,address2,1111,4MM013 6CS005 6CS014 4CI002
+3,teacher3,teacher3,Sugam,Karki,address3,1111,4CS016 6MM026 4CI003
+4,teacher4,teacher4,Apple,Thapa,address4,1111,4CS015 6MM029 4CI004
 5,teacher5,teacher5,Banana,Pokhrel,address5,1111,4CS017 4MM001 6CS012
 6,teacher6,teacher6,Bishal,Thapa,address6,1111,4CS001 4CS018 6CS027
 7,teacher7,teacher7,Bishal,Shrestha,address7,1111,4MM025 4MM002 6CS025

@@ -15,10 +15,8 @@ import java.util.ArrayList;
 
 public class CourseRegister extends JFrame implements ActionListener {
 
-    JPanel panel, coursePanel;
-    JLabel title_label;
-    JButton back, bj;
-    Student st;
+    private final JButton back;
+    private final Student st;
     public CourseRegister(Student st){
 
         Font titleFont = new Font("Bahnschrift", Font.BOLD, 20);
@@ -26,7 +24,7 @@ public class CourseRegister extends JFrame implements ActionListener {
 
         this.st = st;
         // Title Label
-        title_label = new JLabel();
+        JLabel title_label = new JLabel();
         title_label.setText("COURSE REGISTER");
         title_label.setFont(titleFont);
 
@@ -39,19 +37,20 @@ public class CourseRegister extends JFrame implements ActionListener {
         back.setBounds(30, 380, 140, 30);
 
 
-        panel = new JPanel(null);
+        JPanel panel = new JPanel(null);
         panel.setBorder(new EmptyBorder(10,10,10,10));
 
 
-        coursePanel = new JPanel();
+        JPanel coursePanel = new JPanel();
         coursePanel.setLayout(new BoxLayout(coursePanel, BoxLayout.Y_AXIS));
         coursePanel.setBackground(Color.white);
 
         ArrayList<JButton> btns = new ArrayList<>();
         ResultSet rs = DBCRUD.getAllActiveCourse();
         try{
+            assert rs != null;
             while(rs.next()){
-                bj = new JButton(rs.getString("courseName"));
+                JButton bj = new JButton(rs.getString("courseName"));
                 bj.setFont(normalFont);
                 bj.setMaximumSize(new Dimension(300, 50));
                 bj.setPreferredSize(new Dimension(300, 50));
@@ -103,6 +102,7 @@ public class CourseRegister extends JFrame implements ActionListener {
             if(!((JButton) e.getSource()).getText().equals("BACK")){
                 String courseName = ((JButton) e.getSource()).getText();
                 int courseId = DBCRUD.getCourseId(courseName);
+                st.setEnrolledCourse(courseId);
                 try {
                     this.dispose();
                     new CourseInfo(st, courseId);

@@ -2,6 +2,10 @@
 4MM013,Computational Mathematics,4,20,0,1,teacher2,1
 4CS016,Embedded Systems Programming,4,20,0,1,teacher3,1
 4CS015,Fundamentals of Computing,4,20,0,1,teacher4,1
+4CI001,Academic Skills ,4,20,0,1,teacher1,2
+4CI002,Maths for CS,4,20,0,1,teacher2,2
+4CI003,Core Programming,4,20,0,1,teacher3,2
+4CI004,Computing,4,20,0,1,teacher4,2
 4CS017,Internet Software Architecture,4,20,0,2,teacher5,1
 4CS001,Introductory Programming And Problem Solving,4,20,0,2,teacher6,1
 4MM025,Probability & Statistics,4,20,0,2,teacher7,1
@@ -42,3 +46,11 @@
 6CS038,Deep Learning (Elective),6,20,1,6,teacher12,1
 6CS039,Flutter (Elective),6,20,1,6,teacher13,2
 6CS040,React Django (Elective),6,20,1,6,teacher14,2
+6CS041,Dot Net (Elective),6,20,1,5,teacher15,1
+6CS042,Drone Development (Elective),6,20,1,5,teacher16,1
+6CS043,Unity (Elective),6,20,1,6,teacher1,1
+6CS044,Blender (Elective),6,20,1,6,teacher3,2
+6CS045,Swift (Elective),6,20,1,5,teacher5,2
+6CS046,IOS Software (Elective),6,20,1,5,teacher6,2
+6CS047,Compiler Development (Elective),6,20,1,6,teacher7,2
+6CS048,Ethical Hacking (Elective),6,20,1,6,teacher8,2

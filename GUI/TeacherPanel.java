@@ -6,8 +6,6 @@ import Users.Teacher;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableModel;
 import java.awt.*;
@@ -23,7 +21,7 @@ public class TeacherPanel extends JFrame implements ActionListener {
 
     private final JPanel bottomPanel;
     private JPanel infoPanel;
-    private JScrollPane modulesPane,resultPane;
+    private JScrollPane modulesPane;
     private final JButton logOutBtn;
     private final JButton modulesBtn;
     private final JButton resultBtn;
@@ -38,7 +36,6 @@ public class TeacherPanel extends JFrame implements ActionListener {
     private final int ROW_HEIGHT = HEIGHT/7;
     private final Teacher t;
 
-    private final Font titleFont = new Font("Bahnschrift", Font.PLAIN, 20);
     private final Font titleFont2 = new Font("Bahnschrift", Font.BOLD, 14);
     private final Font normalFont = new Font("Bahnschrift", Font.PLAIN, 13);
 
@@ -57,6 +54,7 @@ public class TeacherPanel extends JFrame implements ActionListener {
 
         JLabel welcomeLabel = new JLabel();
         welcomeLabel.setText("Welcome, " + t.getFirstName());
+        Font titleFont = new Font("Bahnschrift", Font.PLAIN, 20);
         welcomeLabel.setFont(titleFont);
         welcomeLabel.setBounds(25,15,300,45);
 
@@ -125,9 +123,6 @@ public class TeacherPanel extends JFrame implements ActionListener {
     }
 
     private void refresh(){
-        if(resultPane!=null){
-            bottomPanel.remove(resultPane);
-        }
         if(infoPanel!=null) {
             bottomPanel.remove(infoPanel);
         }
@@ -159,12 +154,13 @@ public class TeacherPanel extends JFrame implements ActionListener {
         Vector<Vector<String>> data = new Vector<>();
         if(!t.getTeacherModules().equals("null")){
 
-            for(int i = 0; i < teacherModules.size(); i++){
+            for (String teacherModule : teacherModules) {
 
                 Vector<String> row = new Vector<>(columnNames.size());
-                System.out.println(teacherModules.get(i));
-                rs = DBCRUD.getModuleData(teacherModules.get(i));
-                if(rs.next()){
+                System.out.println(teacherModule);
+                rs = DBCRUD.getModuleData(teacherModule);
+                assert rs != null;
+                if (rs.next()) {
                     row.addElement(rs.getString("moduleCode"));
                     row.addElement(rs.getString("moduleName"));
                     row.addElement(rs.getString("moduleLevel"));
@@ -184,15 +180,6 @@ public class TeacherPanel extends JFrame implements ActionListener {
         }
 
         JTable table = new JTable(data, columnNames){
-            public Class getColumnClass(int column){
-                for(int row =0; row<getRowCount(); row++){
-                    Object o = getValueAt(row, column);
-                    if(o!= null){
-                        return o.getClass();
-                    }
-                }
-                return Object.class;
-            }
 
             @Override
             public boolean isCellEditable(int row, int col) {
@@ -250,11 +237,6 @@ public class TeacherPanel extends JFrame implements ActionListener {
         }
 
 
-        JComboBox jComboBox = new JComboBox(teacherModules.toArray());
-
-
-
-
         Vector<String> columnNames = new Vector<>();
         columnNames.add("Username");
         columnNames.add("Student");
@@ -269,9 +251,11 @@ public class TeacherPanel extends JFrame implements ActionListener {
 
 
         ResultSet rs = DBCRUD.getStudentDataFromModule(moduleCode);
-        while(rs.next()){
+        while(true){
+            assert rs != null;
+            if (!rs.next()) break;
             assert teacherModules != null;
-            if(rs.getInt("passedSem")+1 != teacherModulesSem.get(teacherModules.indexOf(moduleCode))){
+            if(teacherModulesSem.get(teacherModules.indexOf(moduleCode)) != rs.getInt("passedSem") + 1){
                 continue;
             }
             Vector<String> row = new Vector<>(columnNames.size());
@@ -292,67 +276,51 @@ public class TeacherPanel extends JFrame implements ActionListener {
 
 
         JTable table = new JTable(data, columnNames){
-            public Class getColumnClass(int column){
-                for(int row =0; row<getRowCount(); row++){
-                    Object o = getValueAt(row, column);
-                    if(o!= null){
-                        return o.getClass();
-                    }
-                }
-                return Object.class;
-            }
 
 
             @Override
             public boolean isCellEditable(int row, int col) {
-                int moduleSem = Integer.parseInt((String)this.getValueAt(row,3));
-                System.out.println(row +" " + col);
                 return col == 5;
-
             }
 
 
         };
 
-        table.getModel().addTableModelListener(new TableModelListener() {
-            @Override
-            public void tableChanged(TableModelEvent e) {
-                int row = e.getFirstRow();
-                int column = e.getColumn();
-                TableModel model = (TableModel)e.getSource();
-                Object data = model.getValueAt(row, column);
-                System.out.println(data);
-                if(column == 5 && !data.equals("TBD")){
-                    try{
-                        int dataInt = Integer.parseInt((String) data);
-                        if(dataInt < 0 || dataInt > 100){
-                            JOptionPane.showMessageDialog(null, "Marks should be in range 0-100", "Incorrect Assignment", JOptionPane.ERROR_MESSAGE);
-                            model.setValueAt("TBD", row, column);
-                            return;
-                        }
-                        String student = (String)model.getValueAt(row,0);
-                        ResultSet rs = DBCRUD.getStudentData(student);
-                        Student st;
-
-                        if (rs.next()){
-                            st = new Student(rs.getString("username"), rs.getString("password"));
-                            st.setMarksModule(moduleCode, dataInt);
-                            DBCRUD.updateStudentData(st);
-                        }
-
-                    }catch (NumberFormatException er) {
-                        JOptionPane.showMessageDialog(null, "Please enter a valid integer!", "Incorrect Assignment", JOptionPane.ERROR_MESSAGE);
+        table.getModel().addTableModelListener(e -> {
+            int row = e.getFirstRow();
+            int column = e.getColumn();
+            TableModel model = (TableModel)e.getSource();
+            Object data1 = model.getValueAt(row, column);
+            System.out.println(data1);
+            if(column == 5 && !data1.equals("TBD")){
+                try{
+                    int dataInt = Integer.parseInt((String) data1);
+                    if(dataInt < 0 || dataInt > 100){
+                        JOptionPane.showMessageDialog(null, "Marks should be in range 0-100", "Incorrect Assignment", JOptionPane.ERROR_MESSAGE);
                         model.setValueAt("TBD", row, column);
-
-                    }catch (ClassCastException er){
                         return;
-
-                    }catch(SQLException er){
-                        er.printStackTrace();
                     }
-                }
+                    String student = (String)model.getValueAt(row,0);
+                    ResultSet rs1 = DBCRUD.getStudentData(student);
+                    Student st;
 
+                    if (rs1.next()){
+                        st = new Student(rs1.getString("username"), rs1.getString("password"));
+                        st.setMarksModule(moduleCode, dataInt);
+                        DBCRUD.updateStudentData(st);
+                    }
+
+                }catch (NumberFormatException er) {
+                    JOptionPane.showMessageDialog(null, "Please enter a valid integer!", "Incorrect Assignment", JOptionPane.ERROR_MESSAGE);
+                    model.setValueAt("TBD", row, column);
+
+                }catch (ClassCastException er){
+                    //
+                }catch(SQLException er){
+                    er.printStackTrace();
+                }
             }
+
         });
 
 
@@ -426,22 +394,19 @@ public class TeacherPanel extends JFrame implements ActionListener {
             JButton tEdit = new JButton("Edit");
             tEdit.setFont(normalFont);
 
-            tEdit.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    t.setFirstName(textFirstName.getText());
-                    t.setLastName(textLastName.getText());
-                    t.setAddress(textAddress.getText());
-                    t.setContact(textContact.getText());
-                    t.setPassword(textPassword.getText());
+            tEdit.addActionListener(e -> {
+                t.setFirstName(textFirstName.getText());
+                t.setLastName(textLastName.getText());
+                t.setAddress(textAddress.getText());
+                t.setContact(textContact.getText());
+                t.setPassword(textPassword.getText());
 
-                    if(DBCRUD.updateTeacherData(t)){
-                        JOptionPane.showMessageDialog(null, "Information Updated Successfully!", "Updated", JOptionPane.INFORMATION_MESSAGE);
-                    }else{
-                        JOptionPane.showMessageDialog(null, "Information could not be updated!", "Error", JOptionPane.ERROR_MESSAGE);
-                    }
-
+                if(DBCRUD.updateTeacherData(t)){
+                    JOptionPane.showMessageDialog(null, "Information Updated Successfully!", "Updated", JOptionPane.INFORMATION_MESSAGE);
+                }else{
+                    JOptionPane.showMessageDialog(null, "Information could not be updated!", "Error", JOptionPane.ERROR_MESSAGE);
                 }
+
             });
 
             infoPanel.add(tFirstName);

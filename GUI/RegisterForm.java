@@ -17,14 +17,19 @@ import java.util.ArrayList;
 
 public class RegisterForm extends JFrame implements ActionListener {
 
-    JPanel panel;
-    JLabel user_label, password_label, cPassword_label, message, title_label, first_label, last_label, address_label, contact_label;
+    private final JLabel message;
 
-    JTextField user_text, first_text, last_text, address_text, contact_text;
-    JPasswordField password_text, cPassword_text;
-    JButton register, back;
-    String userType;
-    Admin a;
+    private final JTextField user_text;
+    private final JTextField first_text;
+    private final JTextField last_text;
+    private final JTextField address_text;
+    private final JTextField contact_text;
+    private final JPasswordField password_text;
+    private final JPasswordField cPassword_text;
+    private final JButton register;
+    private final JButton back;
+    private final String userType;
+    private final Admin a;
 
     RegisterForm(String userType, Admin a){
 
@@ -34,19 +39,19 @@ public class RegisterForm extends JFrame implements ActionListener {
         this.a = a;
         this.userType = userType;
         // Title Label
-        title_label = new JLabel();
+        JLabel title_label = new JLabel();
         title_label.setText(userType +" REGISTER");
         title_label.setFont(titleFont);
 
         // Username Label
-        user_label = new JLabel();
+        JLabel user_label = new JLabel();
         user_label.setText("Username");
         user_label.setFont(normalFont);
         user_text = new JTextField();
         user_text.setFont(normalFont);
 
         // First and Last Name
-        first_label = new JLabel();
+        JLabel first_label = new JLabel();
         first_label.setFont(normalFont);
 
         first_label.setText("First Name");
@@ -54,7 +59,7 @@ public class RegisterForm extends JFrame implements ActionListener {
         first_text.setFont(normalFont);
 
 
-        last_label = new JLabel();
+        JLabel last_label = new JLabel();
         last_label.setFont(normalFont);
 
         last_label.setText("Last Name");
@@ -62,14 +67,14 @@ public class RegisterForm extends JFrame implements ActionListener {
         last_text.setFont(normalFont);
 
         // Address and Contact
-        contact_label = new JLabel();
+        JLabel contact_label = new JLabel();
         contact_label.setFont(normalFont);
 
         contact_label.setText("Contact");
         contact_text = new JTextField();
         contact_text.setFont(normalFont);
 
-        address_label = new JLabel();
+        JLabel address_label = new JLabel();
         address_label.setFont(normalFont);
 
         address_label.setText("Address");
@@ -79,7 +84,7 @@ public class RegisterForm extends JFrame implements ActionListener {
 
 
         // Password
-        password_label = new JLabel();
+        JLabel password_label = new JLabel();
         password_label.setFont(normalFont);
 
         password_label.setText("Password");
@@ -89,7 +94,7 @@ public class RegisterForm extends JFrame implements ActionListener {
 
         // Confirm Password
 
-        cPassword_label = new JLabel();
+        JLabel cPassword_label = new JLabel();
         cPassword_label.setFont(normalFont);
 
         cPassword_label.setText("Confirm");
@@ -142,11 +147,7 @@ public class RegisterForm extends JFrame implements ActionListener {
         back.setBounds(30, 380, 140, 30);
 
 
-
-
-
-
-        panel = new JPanel(null);
+        JPanel panel = new JPanel(null);
         panel.setBorder(new EmptyBorder(10,10,10,10));
 
 
@@ -239,7 +240,7 @@ public class RegisterForm extends JFrame implements ActionListener {
                     System.out.println("Teacher Registered");
                     this.dispose();
                     JOptionPane.showMessageDialog(null, "You have been registered successfully.", "Registered", JOptionPane.INFORMATION_MESSAGE);
-                    AdminPanel ap = null;
+                    AdminPanel ap;
                     try {
                         ap = new AdminPanel(a);
                         ap.showTeachersPanel();

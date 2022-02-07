@@ -8,11 +8,10 @@ import java.awt.event.ActionListener;
 
 public class Register extends JFrame implements ActionListener {
 
-    JPanel panel;
-    JLabel title_label;
-    JButton goNext, back;
-    JRadioButton studentBtn, teacherBtn;
-    ButtonGroup group;
+    private final JButton goNext;
+    private final JButton back;
+    private final JRadioButton studentBtn;
+    private final JRadioButton teacherBtn;
 
 
     Register(){
@@ -21,7 +20,7 @@ public class Register extends JFrame implements ActionListener {
         Font normalFont = new Font("Bahnschrift", Font.PLAIN, 13);
 
         // Title Label
-        title_label = new JLabel();
+        JLabel title_label = new JLabel();
         title_label.setText("REGISTER");
         title_label.setFont(titleFont);
 
@@ -41,7 +40,7 @@ public class Register extends JFrame implements ActionListener {
         teacherBtn.addActionListener(this);
 
 
-        group = new ButtonGroup();
+        ButtonGroup group = new ButtonGroup();
         group.add(studentBtn);
         group.add(teacherBtn);
 
@@ -61,11 +60,7 @@ public class Register extends JFrame implements ActionListener {
         back.setBounds(30, 130, 150, 30);
 
 
-
-
-
-
-        panel = new JPanel(null);
+        JPanel panel = new JPanel(null);
         panel.setBorder(new EmptyBorder(10,10,10,10));
 
 
@@ -104,7 +99,7 @@ public class Register extends JFrame implements ActionListener {
                 this.dispose();
                 new RegisterForm("STUDENT", null);
             } else if (teacherBtn.isSelected()){
-                JOptionPane.showMessageDialog(null, "Please contact administration to register as an admin.", "Admin Register", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Please contact administration to register as a teacher.", "Teacher Register", JOptionPane.INFORMATION_MESSAGE);
 
             }
 

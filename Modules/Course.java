@@ -1,14 +1,36 @@
 package Modules;
 
-import Users.Teacher;
-import java.util.ArrayList;
+
+import DBHelpers.DBCRUD;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class Course {
     private String courseName;
-    private int courseDuration; // In years
+    private int courseDuration;
     private int courseSemesters;
-    private boolean isAvailable;
-    private ArrayList<Module> modules;
+    private int isAvailable;
+    private int courseId;
+    private String courseModules;
+
+    public Course(int courseId) {
+        this.courseId = courseId;
+
+        try{
+            ResultSet rs = DBCRUD.getCourseData(courseId);
+            assert rs != null;
+            if(rs.next()){
+                setCourseDuration(rs.getInt("courseDuration"));
+                setCourseName(rs.getString("courseName"));
+                setCourseSemesters(rs.getInt("courseSemesters"));
+                setCourseModules(rs.getString("courseModules"));
+                setAvailable(rs.getInt("courseIsAvailable"));
+            }
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+    }
 
     public void setCourseName(String courseName) {
         this.courseName = courseName;
@@ -27,11 +49,11 @@ public class Course {
         return courseSemesters;
     }
 
-    public void setAvailable(boolean available) {
+    public void setAvailable(int available) {
         isAvailable = available;
     }
 
-    public boolean getAvailable(){
+    public int getAvailable(){
         return isAvailable;
     }
 
@@ -43,12 +65,20 @@ public class Course {
         return courseDuration;
     }
 
-    public void setModules(ArrayList<Module> modules) {
-        this.modules = modules;
+
+    public int getCourseId() {
+        return courseId;
     }
 
-    public ArrayList<Module> getModules() {
-        return modules;
+    public void setCourseId(int courseId) {
+        this.courseId = courseId;
     }
 
+    public String getCourseModules() {
+        return courseModules;
+    }
+
+    public void setCourseModules(String courseModules) {
+        this.courseModules = courseModules;
+    }
 }
