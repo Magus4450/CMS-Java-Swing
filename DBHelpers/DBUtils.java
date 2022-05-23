@@ -1,9 +1,10 @@
 package DBHelpers;
 
 import javax.swing.*;
-import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.*;
+import java.net.URISyntaxException;
 import java.sql.*;
+import java.util.Objects;
 import java.util.Scanner;
 
 import static DBHelpers.DBCRUD.*;
@@ -199,7 +200,6 @@ public class DBUtils {
         } catch (FileNotFoundException e) {
             System.out.println("studentData.csv not Found!");
             e.printStackTrace();
-
         }
     }
 
@@ -214,8 +214,7 @@ public class DBUtils {
             System.out.println("Teacher data dumped into database successfully!");
             sc.close();
         } catch (FileNotFoundException e) {
-
-            System.out.println("studentData.csv not Found!");
+            System.out.println("teacherData.csv not Found!");
             e.printStackTrace();
         }
     }
@@ -224,14 +223,14 @@ public class DBUtils {
         try {
             Scanner sc = new Scanner(new File("src/DummyData/adminData.csv"));
             String[] data;
-            while (sc.hasNext()) {
-                data = sc.next().split(",");
+            while (sc.hasNextLine()) {
+                data = sc.nextLine().split(",");
                 insertIntoAdmin(data);
             }
             System.out.println("Admin data dumped into database successfully!");
             sc.close();
         } catch (FileNotFoundException e) {
-            System.out.println("studentData.csv not Found!");
+            System.out.println("adminData.csv not Found!");
             e.printStackTrace();
         }
 
@@ -268,8 +267,5 @@ public class DBUtils {
             System.out.println("moduleData.csv not Found!");
             e.printStackTrace();
         }
-
     }
-
-
 }
